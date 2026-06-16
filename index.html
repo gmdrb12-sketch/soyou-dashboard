@@ -198,35 +198,85 @@ body {
 .kpi-amt strong { color: var(--text2); font-weight: 600; }
 
 /* ── URGENT ── */
-.urgent-list { display: flex; flex-direction: column; gap: 8px; }
-.urgent-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 12px 16px;
+.urgent-summary {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.urgent-chip {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 14px;
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-left: 3px solid;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.12s;
+  transition: all 0.15s;
+  user-select: none;
 }
-.urgent-item:hover { background: var(--surface3); }
-.urgent-item.u-over { border-left-color: var(--red); }
-.urgent-item.u-nocon { border-left-color: var(--yellow); }
-.urgent-item.u-soon { border-left-color: var(--orange); }
+.urgent-chip:hover { border-color: var(--border2); background: var(--surface3); }
+.urgent-chip.uc-over { border-left: 3px solid var(--red); }
+.urgent-chip.uc-nocon { border-left: 3px solid var(--yellow); }
+.urgent-chip.uc-soon { border-left: 3px solid var(--orange); }
+.uc-badge {
+  font-size: 10px; font-weight: 800; padding: 2px 7px;
+  border-radius: 4px; white-space: nowrap;
+}
+.uc-over .uc-badge { background: var(--red-dim); color: var(--red); }
+.uc-nocon .uc-badge { background: var(--yellow-dim); color: var(--yellow); }
+.uc-soon .uc-badge { background: var(--orange-dim); color: var(--orange); }
+.uc-label { font-size: 12px; font-weight: 600; color: var(--text2); white-space: nowrap; }
+.uc-count {
+  font-size: 18px; font-weight: 800;
+  min-width: 24px; text-align: center;
+}
+.uc-over .uc-count { color: var(--red); }
+.uc-nocon .uc-count { color: var(--yellow); }
+.uc-soon .uc-count { color: var(--orange); }
+.uc-arrow { font-size: 11px; color: var(--muted); margin-left: 2px; }
+.urgent-none { font-size: 13px; color: var(--muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
 
+/* 긴급 드로어 */
+.urgent-drawer {
+  display: none; margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.urgent-drawer.open { display: block; }
+.urgent-drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.4px; text-transform: uppercase;
+}
+.drawer-close {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 14px; padding: 0; line-height: 1;
+}
+.drawer-close:hover { color: var(--text); }
+.urgent-list { display: flex; flex-direction: column; }
+.urgent-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--divider);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.urgent-item:last-child { border-bottom: none; }
+.urgent-item:hover { background: var(--surface2); }
+.urgent-item.u-over { border-left: 2px solid var(--red); }
+.urgent-item.u-nocon { border-left: 2px solid var(--yellow); }
+.urgent-item.u-soon { border-left: 2px solid var(--orange); }
 .u-badge {
-  font-size: 10px; font-weight: 800; padding: 3px 8px;
+  font-size: 10px; font-weight: 800; padding: 2px 7px;
   border-radius: 4px; white-space: nowrap; flex-shrink: 0;
 }
 .u-over .u-badge { background: var(--red-dim); color: var(--red); }
 .u-nocon .u-badge { background: var(--yellow-dim); color: var(--yellow); }
 .u-soon .u-badge { background: var(--orange-dim); color: var(--orange); }
-
 .u-co { font-size: 13px; font-weight: 700; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .u-writer { font-size: 11px; color: var(--muted); white-space: nowrap; }
 .u-amt { font-size: 13px; font-weight: 700; white-space: nowrap; }
 .u-dday { font-size: 11px; color: var(--text2); white-space: nowrap; }
-.urgent-none { font-size: 13px; color: var(--muted); padding: 8px 0; display: flex; align-items: center; gap: 6px; }
 
 /* ── WRITER TABLE ── */
 .writer-table { width: 100%; border-collapse: collapse; }
@@ -534,35 +584,7 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
       </div>
     </div>
 
-    <!-- 2. 긴급 알림 -->
-    <div class="report-section">
-      <div class="section-label">
-        지금 챙겨야 할 건
-        <span id="urgentCount" style="background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:10px;letter-spacing:0;text-transform:none">0</span>
-      </div>
-      <div id="urgentList"><div class="urgent-none">긴급 건 없음 ✅</div></div>
-    </div>
-
-    <!-- 3. 담당자 현황 -->
-    <div class="report-section">
-      <div class="section-label">담당자별 현황</div>
-      <table class="writer-table">
-        <thead><tr>
-          <th>담당자</th><th>전체</th>
-          <th>성공</th><th>가망</th><th>실패</th>
-          <th>현황</th><th>총 금액</th>
-        </tr></thead>
-        <tbody id="writerTbody"></tbody>
-      </table>
-    </div>
-
-    <!-- 4. 설비 현황 -->
-    <div class="report-section">
-      <div class="section-label">설비 유형별 현황</div>
-      <div id="equipChart"></div>
-    </div>
-
-    <!-- 5. 견적 내역 -->
+    <!-- 2. 견적 내역 -->
     <div class="report-section">
       <div class="section-label">견적 전체 내역</div>
 
@@ -613,6 +635,43 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
       </div>
 
       <div id="tableBody"></div>
+    </div>
+
+    <!-- 3. 긴급 알림 -->
+    <div class="report-section">
+      <div class="section-label">
+        지금 챙겨야 할 건
+        <span id="urgentCount" style="background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:10px;letter-spacing:0;text-transform:none">0</span>
+      </div>
+      <div class="urgent-summary" id="urgentSummary">
+        <div class="urgent-none">✅ 긴급 건 없음</div>
+      </div>
+      <div class="urgent-drawer" id="urgentDrawer">
+        <div class="urgent-drawer-header">
+          <span id="drawerTitle">상세 내역</span>
+          <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="urgent-list" id="urgentList"></div>
+      </div>
+    </div>
+
+    <!-- 4. 담당자 현황 -->
+    <div class="report-section">
+      <div class="section-label">담당자별 현황</div>
+      <table class="writer-table">
+        <thead><tr>
+          <th>담당자</th><th>전체</th>
+          <th>성공</th><th>가망</th><th>실패</th>
+          <th>현황</th><th>총 금액</th>
+        </tr></thead>
+        <tbody id="writerTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- 5. 설비 현황 -->
+    <div class="report-section">
+      <div class="section-label">설비 유형별 현황</div>
+      <div id="equipChart"></div>
     </div>
 
   </div>
@@ -784,30 +843,56 @@ function renderKPI(){
 }
 
 // ── Urgent ──
+let urgentItems = [];
 function renderUrgent(){
   const pending=allData.filter(r=>r._status==='pending');
-  const items=[];
+  urgentItems=[];
   pending.forEach(r=>{
     const dd=parseDate(r['수주예상일']||'');
     const diff=dd?Math.floor((dd-baseDate)/86400000):null;
     const lm=parseLastMod(r['최종수정일시']||'');
     const cd=daysDiff(lm);
     const amt=+r['금액합계(VAT포함)']||0;
-    if(diff!==null&&diff<0) items.push({cls:'u-over',badge:`D+${Math.abs(diff)} 초과`,r,sub:r['수주예상일']||'',amt,sort:0});
-    else if(cd!==null&&cd>=7) items.push({cls:'u-nocon',badge:`${cd}일 미연락`,r,sub:'연락 필요',amt,sort:1});
-    else if(diff!==null&&diff>=0&&diff<=3) items.push({cls:'u-soon',badge:`D-${diff} 임박`,r,sub:r['수주예상일']||'',amt,sort:2});
+    if(diff!==null&&diff<0) urgentItems.push({cls:'u-over',ucls:'uc-over',badge:`D+${Math.abs(diff)} 초과`,label:'예상일 초과',r,sub:r['수주예상일']||'',amt,sort:0,type:'over'});
+    else if(cd!==null&&cd>=7) urgentItems.push({cls:'u-nocon',ucls:'uc-nocon',badge:`${cd}일 미연락`,label:'미연락',r,sub:'연락 필요',amt,sort:1,type:'nocon'});
+    else if(diff!==null&&diff>=0&&diff<=3) urgentItems.push({cls:'u-soon',ucls:'uc-soon',badge:`D-${diff} 임박`,label:'마감 임박',r,sub:r['수주예상일']||'',amt,sort:2,type:'soon'});
   });
-  items.sort((a,b)=>a.sort-b.sort||b.amt-a.amt);
-  document.getElementById('urgentCount').textContent=items.length;
-  document.getElementById('urgentList').innerHTML=items.length===0
-    ?'<div class="urgent-none">✅ 긴급 건 없음</div>'
-    :items.map(u=>`<div class="urgent-item ${u.cls}" onclick="openModalByRow(${allData.indexOf(u.r)})">
-        <span class="u-badge">${u.badge}</span>
-        <span class="u-co">${u.r['거래처명']}</span>
-        <span class="u-writer">${getWriter(u.r)}</span>
-        <span class="u-dday">${u.sub}</span>
-        <span class="u-amt">${fmtAmt(u.amt)}</span>
-      </div>`).join('');
+  urgentItems.sort((a,b)=>a.sort-b.sort||b.amt-a.amt);
+  document.getElementById('urgentCount').textContent=urgentItems.length;
+
+  if(urgentItems.length===0){
+    document.getElementById('urgentSummary').innerHTML='<div class="urgent-none">✅ 긴급 건 없음</div>';
+    document.getElementById('urgentDrawer').classList.remove('open');
+    return;
+  }
+
+  // 타입별 집계
+  const groups={over:[],nocon:[],soon:[]};
+  urgentItems.forEach(u=>groups[u.type].push(u));
+
+  let chips='';
+  if(groups.over.length) chips+=`<div class="urgent-chip uc-over" onclick="openDrawer('over','예상일 초과 ${groups.over.length}건')"><span class="uc-badge">초과</span><span class="uc-label">예상일 초과</span><span class="uc-count">${groups.over.length}</span><span class="uc-arrow">›</span></div>`;
+  if(groups.nocon.length) chips+=`<div class="urgent-chip uc-nocon" onclick="openDrawer('nocon','미연락 ${groups.nocon.length}건')"><span class="uc-badge">미연락</span><span class="uc-label">7일+ 미연락</span><span class="uc-count">${groups.nocon.length}</span><span class="uc-arrow">›</span></div>`;
+  if(groups.soon.length) chips+=`<div class="urgent-chip uc-soon" onclick="openDrawer('soon','마감 임박 ${groups.soon.length}건')"><span class="uc-badge">임박</span><span class="uc-label">D-3 이내</span><span class="uc-count">${groups.soon.length}</span><span class="uc-arrow">›</span></div>`;
+  document.getElementById('urgentSummary').innerHTML=chips;
+}
+
+function openDrawer(type, title){
+  const items=urgentItems.filter(u=>u.type===type);
+  document.getElementById('drawerTitle').textContent=title;
+  document.getElementById('urgentList').innerHTML=items.map(u=>`
+    <div class="urgent-item ${u.cls}" onclick="openModalByRow(${allData.indexOf(u.r)})">
+      <span class="u-badge">${u.badge}</span>
+      <span class="u-co">${u.r['거래처명']}</span>
+      <span class="u-writer">${getWriter(u.r)}</span>
+      <span class="u-dday">${u.sub}</span>
+      <span class="u-amt">${fmtAmt(u.amt)}</span>
+    </div>`).join('');
+  document.getElementById('urgentDrawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('urgentDrawer').classList.remove('open');
 }
 
 // ── Writer ──
