@@ -638,8 +638,11 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
         class="update-input"
         type="text"
         id="updateTimestamp"
-        placeholder="년도 월 일 시간 입력"
-        maxlength="30"
+        placeholder="구글 시트 '설정' 탭 A1에 입력"
+        maxlength="40"
+        readonly
+        title="구글 시트 '설정' 탭 A1 셀에 업데이트 일자를 입력하세요"
+        style="cursor:default"
       >
     </div>
   </div>
@@ -943,6 +946,20 @@ function csvLine(line){const r=[];let c='',q=false;for(const ch of line){if(ch==
 
 // ── Load ──
 async function loadAll() {
+  // 설정 탭에서 업데이트 일자 읽기
+  try {
+    const cfgUrl=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('설정')}`;
+    const cfgRes=await fetch(cfgUrl);
+    if(cfgRes.ok){
+      const cfgText=await cfgRes.text();
+      const firstLine=cfgText.split('\n')[0];
+      const val=firstLine.replace(/^"|"$/g,'').trim();
+      if(val){
+        document.getElementById('updateTimestamp').value=val;
+      }
+    }
+  } catch(e){}
+
   const res=await Promise.all(Object.keys(TABS).map(fetchTab));
   allData=res.flat();
   const ws=[...new Set(allData.map(r=>getWriter(r)).filter(Boolean))].sort();
@@ -1245,14 +1262,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTheme(saved);
   document.getElementById('baseDate').value=fmt(new Date());
   document.getElementById('baseDate').addEventListener('change',applyFilters);
-
-  // 업데이트 일자 불러오기/저장
-  const tsEl = document.getElementById('updateTimestamp');
-  const savedTs = localStorage.getItem('soyuUpdateTs')||'';
-  if (savedTs) tsEl.value = savedTs;
-  tsEl.addEventListener('input', () => {
-    localStorage.setItem('soyuUpdateTs', tsEl.value);
-  });
 
   loadAll();
 });
