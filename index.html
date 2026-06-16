@@ -751,6 +751,7 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
   .kpi-num { font-size: 28px !important; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </head>
 <body>
 
@@ -789,6 +790,13 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
       <input type="date" id="baseDate">
       <button class="btn-today" onclick="setToday()">오늘</button>
     </div>
+    <div class="date-pill" style="gap:5px">
+      <label>기간</label>
+      <input type="date" id="rangeStart" style="width:88px">
+      <span style="color:var(--muted);font-size:11px">~</span>
+      <input type="date" id="rangeEnd" style="width:88px">
+      <button class="btn-today" style="background:var(--surface3);color:var(--text2);border:1px solid var(--border2)" onclick="clearRange()">전체</button>
+    </div>
   </div>
 </div>
 
@@ -805,7 +813,7 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 
       <!-- 1. 전체 현황 -->
       <div class="report-section">
-        <div class="section-label">전체 현황</div>
+        <div class="section-label" id="kpiSectionLabel">전체 현황</div>
         <div class="kpi-row">
           <div class="kpi-cell k-all">
             <div class="kpi-top"><span class="kpi-lbl">전체 견적</span><span class="kpi-pct" id="kT-pct">전체</span></div>
@@ -946,14 +954,20 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
     <button class="big-modal-x" onclick="closeTrendModal()">✕</button>
     <div class="big-modal-title">📊 월별 수주 추이</div>
 
-    <div class="trend-summary">
+    <!-- 4개 KPI -->
+    <div class="trend-summary" style="grid-template-columns:repeat(4,1fr)">
       <div class="trend-stat">
-        <div class="trend-stat-lbl">이번달 수주</div>
-        <div class="trend-stat-val" id="trendThisMonth" style="color:var(--green)">–</div>
-        <div class="trend-stat-sub" id="trendThisAmt">–</div>
+        <div class="trend-stat-lbl">이번달 성공</div>
+        <div class="trend-stat-val" id="trendThisSuccess" style="color:var(--green)">–</div>
+        <div class="trend-stat-sub" id="trendThisSuccessAmt">–</div>
       </div>
       <div class="trend-stat">
-        <div class="trend-stat-lbl">전월 대비</div>
+        <div class="trend-stat-lbl">이번달 실패</div>
+        <div class="trend-stat-val" id="trendThisFail" style="color:var(--red)">–</div>
+        <div class="trend-stat-sub" id="trendThisFailSub">–</div>
+      </div>
+      <div class="trend-stat">
+        <div class="trend-stat-lbl">전월 대비 (수주금액)</div>
         <div class="trend-stat-val" id="trendMoM">–</div>
         <div class="trend-stat-sub" id="trendMoMSub">–</div>
       </div>
@@ -965,9 +979,9 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
     </div>
 
     <div class="trend-legend">
-      <div class="tl-item"><div class="tl-dot" style="background:var(--red)"></div>수주금액</div>
-      <div class="tl-item"><div class="tl-dot" style="background:var(--blue);border-radius:50%"></div>견적건수</div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--red)"></div>수주금액(만원)</div>
       <div class="tl-item"><div class="tl-dot" style="background:var(--green);border-radius:50%"></div>성공건수</div>
+      <div class="tl-item"><div class="tl-dot" style="background:#aaa;border-radius:50%"></div>실패건수</div>
     </div>
     <div class="trend-chart-wrap">
       <canvas id="trendChart" role="img" aria-label="월별 수주 추이 차트">월별 수주 추이</canvas>
@@ -1183,6 +1197,15 @@ function applyFilters() {
   const bd=document.getElementById('baseDate').value;
   if(bd) baseDate=new Date(bd);
 
+  // 기간 필터
+  const rsEl=document.getElementById('rangeStart');
+  const reEl=document.getElementById('rangeEnd');
+  const rangeStart = rsEl&&rsEl.value ? new Date(rsEl.value) : null;
+  const rangeEnd   = reEl&&reEl.value ? new Date(reEl.value+'T23:59:59') : null;
+
+  // 기준일 월 (기간 미설정시 기준일 해당 월 기준)
+  const baseMonth = baseDate.getFullYear()*100 + baseDate.getMonth();
+
   filtered=allData.filter(r=>{
     if(filters.biz!=='all'&&r._biz!==filters.biz) return false;
     if(filters.period!=='all'&&r._status==='pending'&&r._period!==filters.period) return false;
@@ -1190,10 +1213,39 @@ function applyFilters() {
     if(writer!=='all'&&getWriter(r)!==writer) return false;
     if(inflow!=='all'&&(r['유입경로']||'')!==inflow) return false;
     if(search){const h=((r['거래처명']||'')+(r['품목명(요약)']||'')+(r['견적명']||'')).toLowerCase();if(!h.includes(search))return false;}
+
+    // 기간 필터 적용
+    if(rangeStart||rangeEnd){
+      const d=parseDate((r['일자-No.']||'').split(' ')[0]);
+      if(!d) return false;
+      if(rangeStart&&d<rangeStart) return false;
+      if(rangeEnd&&d>rangeEnd) return false;
+    }
     return true;
   });
 
+  // KPI 섹션 라벨 업데이트
+  const lbl = document.getElementById('kpiSectionLabel');
+  if(lbl){
+    if(rangeStart&&rangeEnd){
+      lbl.textContent = `${rangeStart.toLocaleDateString('ko-KR',{month:'long',day:'numeric'})} ~ ${rangeEnd.toLocaleDateString('ko-KR',{month:'long',day:'numeric'})} 현황`;
+    } else if(rangeStart){
+      lbl.textContent = `${rangeStart.toLocaleDateString('ko-KR',{month:'long',day:'numeric'})} 이후 현황`;
+    } else {
+      const y=baseDate.getFullYear(), m=baseDate.getMonth()+1;
+      lbl.textContent = `${y}년 ${m}월 현황`;
+    }
+  }
+
   renderKPI(); renderUrgent(); renderWriter(); renderEquip(); renderInflow(); renderTable();
+}
+
+function clearRange(){
+  const rs=document.getElementById('rangeStart');
+  const re=document.getElementById('rangeEnd');
+  if(rs) rs.value='';
+  if(re) re.value='';
+  applyFilters();
 }
 
 // ── KPI ──
@@ -1461,50 +1513,64 @@ function closeTrendModal() { document.getElementById('trendOverlay').classList.r
 function closeTrendOutside(e) { if(e.target===document.getElementById('trendOverlay')) closeTrendModal(); }
 
 function renderTrendChart() {
-  // 월별 데이터 집계 (전체 데이터 기준)
+  if (typeof Chart === 'undefined') { console.warn('Chart.js 아직 로딩중'); return; }
+
+  // 전체 allData 기준으로 월별 집계
   const monthMap = {};
   allData.forEach(r => {
     const d = parseDate((r['일자-No.']||'').split(' ')[0]);
     if (!d) return;
     const k = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0');
-    if (!monthMap[k]) monthMap[k] = { success:0, fail:0, pending:0, amt:0, successAmt:0 };
-    monthMap[k].amt += (+r['금액합계(VAT포함)']||0);
+    if (!monthMap[k]) monthMap[k] = { success:0, fail:0, pending:0, successAmt:0, failAmt:0 };
     if (r._status==='success') { monthMap[k].success++; monthMap[k].successAmt+=(+r['금액합계(VAT포함)']||0); }
-    else if (r._status==='fail') monthMap[k].fail++;
+    else if (r._status==='fail') { monthMap[k].fail++; monthMap[k].failAmt+=(+r['금액합계(VAT포함)']||0); }
     else monthMap[k].pending++;
   });
 
   const months = Object.keys(monthMap).sort();
   const labels = months.map(m => m.replace('/','.'));
-  const amtData = months.map(m => Math.round(monthMap[m].successAmt/10000));
-  const totalData = months.map(m => monthMap[m].success + monthMap[m].fail + monthMap[m].pending);
+  const amtData    = months.map(m => Math.round(monthMap[m].successAmt/10000));
   const successData = months.map(m => monthMap[m].success);
+  const failData    = months.map(m => monthMap[m].fail);
 
-  // 이번달 통계
-  const now = new Date();
-  const thisKey = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2,'0');
-  const prevKey = months[months.indexOf(thisKey)-1];
-  const thisD = monthMap[thisKey] || {success:0,fail:0,pending:0,successAmt:0};
-  const prevD = monthMap[prevKey] || {success:0,fail:0,pending:0,successAmt:0};
+  // 기준일 기반 이번달/전월
+  const thisKey = baseDate.getFullYear() + '/' + String(baseDate.getMonth()+1).padStart(2,'0');
+  const thisIdx = months.indexOf(thisKey);
+  const prevKey = thisIdx > 0 ? months[thisIdx-1] : null;
+  const thisD = monthMap[thisKey] || {success:0,fail:0,pending:0,successAmt:0,failAmt:0};
+  const prevD = prevKey ? (monthMap[prevKey]||{success:0,successAmt:0}) : {success:0,successAmt:0};
 
-  document.getElementById('trendThisMonth').textContent = thisD.success + '건';
-  document.getElementById('trendThisAmt').textContent = fmtAmt(thisD.successAmt);
+  // 이번달 성공
+  document.getElementById('trendThisSuccess').textContent = thisD.success + '건';
+  document.getElementById('trendThisSuccessAmt').textContent = fmtAmt(thisD.successAmt);
 
-  const mom = prevD.successAmt > 0 ? Math.round((thisD.successAmt - prevD.successAmt)/prevD.successAmt*100) : 0;
+  // 이번달 실패
+  document.getElementById('trendThisFail').textContent = thisD.fail + '건';
+  document.getElementById('trendThisFailSub').textContent = fmtAmt(thisD.failAmt);
+
+  // 전월 대비
   const momEl = document.getElementById('trendMoM');
-  momEl.textContent = (mom >= 0 ? '+' : '') + mom + '%';
-  momEl.style.color = mom >= 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('trendMoMSub').textContent = '전월 ' + fmtAmt(prevD.successAmt);
+  if (prevD.successAmt > 0) {
+    const mom = Math.round((thisD.successAmt - prevD.successAmt)/prevD.successAmt*100);
+    momEl.textContent = (mom>=0?'+':'') + mom + '%';
+    momEl.style.color = mom>=0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('trendMoMSub').textContent = '전월 ' + fmtAmt(prevD.successAmt);
+  } else {
+    momEl.textContent = '–';
+    momEl.style.color = 'var(--muted)';
+    document.getElementById('trendMoMSub').textContent = '전월 데이터 없음';
+  }
 
+  // 누적 성공률
   const totalS = allData.filter(r=>r._status==='success').length;
-  const totalAll = allData.length;
-  const rate = totalAll ? Math.round(totalS/totalAll*100) : 0;
+  const totalClosed = allData.filter(r=>r._status==='success'||r._status==='fail').length;
+  const rate = totalClosed ? Math.round(totalS/totalClosed*100) : 0;
   document.getElementById('trendRate').textContent = rate + '%';
-  document.getElementById('trendRateSub').textContent = `전체 ${totalAll}건 중 ${totalS}건 성공`;
+  document.getElementById('trendRateSub').textContent = `결론난 ${totalClosed}건 중 ${totalS}건 성공`;
 
-  // 차트
+  // 차트 그리기
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+  const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
   const textColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
 
   const existing = Chart.getChart('trendChart');
@@ -1518,25 +1584,12 @@ function renderTrendChart() {
         {
           label: '수주금액(만원)',
           data: amtData,
-          backgroundColor: 'rgba(232,25,44,0.18)',
+          backgroundColor: 'rgba(232,25,44,0.15)',
           borderColor: '#e8192c',
           borderWidth: 1.5,
           borderRadius: 4,
           order: 3,
-        },
-        {
-          label: '견적건수',
-          data: totalData,
-          type: 'line',
-          borderColor: '#3b82f6',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          pointRadius: 4,
-          pointBackgroundColor: '#3b82f6',
-          tension: 0.3,
-          yAxisID: 'y2',
-          order: 1,
-          borderDash: [4,3],
+          yAxisID: 'y',
         },
         {
           label: '성공건수',
@@ -1549,7 +1602,21 @@ function renderTrendChart() {
           pointBackgroundColor: '#22c55e',
           tension: 0.3,
           yAxisID: 'y2',
+          order: 1,
+        },
+        {
+          label: '실패건수',
+          data: failData,
+          type: 'line',
+          borderColor: '#888',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#888',
+          tension: 0.3,
+          yAxisID: 'y2',
           order: 2,
+          borderDash: [4,3],
         }
       ]
     },
@@ -1558,23 +1625,32 @@ function renderTrendChart() {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { mode: 'index', intersect: false }
+        tooltip: {
+          mode: 'index', intersect: false,
+          callbacks: {
+            label: ctx => {
+              if(ctx.datasetIndex===0) return ' 수주금액: ' + ctx.parsed.y + '만원';
+              if(ctx.datasetIndex===1) return ' 성공: ' + ctx.parsed.y + '건';
+              return ' 실패: ' + ctx.parsed.y + '건';
+            }
+          }
+        }
       },
       scales: {
         x: {
           grid: { color: gridColor },
-          ticks: { color: textColor, font: { size: 11 }, autoSkip: false, maxRotation: 45 }
+          ticks: { color: textColor, font:{size:11}, autoSkip: false, maxRotation: 45 }
         },
         y: {
           grid: { color: gridColor },
-          ticks: { color: textColor, font: { size: 11 }, callback: v => Math.round(v) + '만' },
-          position: 'left', title: { display: true, text: '수주금액(만원)', color: textColor, font: {size:10} }
+          ticks: { color: '#e8192c', font:{size:10}, callback: v => Math.round(v)+'만' },
+          position: 'left',
         },
         y2: {
           grid: { display: false },
-          ticks: { color: textColor, font: { size: 11 }, callback: v => v + '건', stepSize: 1 },
+          ticks: { color: textColor, font:{size:10}, callback: v => v+'건', stepSize:1 },
           position: 'right',
-          title: { display: true, text: '건수', color: textColor, font: {size:10} }
+          min: 0,
         }
       }
     }
@@ -1707,10 +1783,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTheme(saved);
   document.getElementById('baseDate').value=fmt(new Date());
   document.getElementById('baseDate').addEventListener('change',applyFilters);
+  document.getElementById('rangeStart').addEventListener('change',applyFilters);
+  document.getElementById('rangeEnd').addEventListener('change',applyFilters);
 
   loadAll();
 });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </body>
 </html>
