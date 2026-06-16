@@ -979,9 +979,10 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
     </div>
 
     <div class="trend-legend">
-      <div class="tl-item"><div class="tl-dot" style="background:var(--red)"></div>수주금액(만원)</div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--red)"></div>수주금액</div>
       <div class="tl-item"><div class="tl-dot" style="background:var(--green);border-radius:50%"></div>성공건수</div>
       <div class="tl-item"><div class="tl-dot" style="background:#aaa;border-radius:50%"></div>실패건수</div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--yellow);border-radius:2px;transform:rotate(45deg)"></div>진행중(현재)</div>
     </div>
     <div class="trend-chart-wrap">
       <canvas id="trendChart" role="img" aria-label="월별 수주 추이 차트">월별 수주 추이</canvas>
@@ -1214,8 +1215,8 @@ function applyFilters() {
     if(inflow!=='all'&&(r['유입경로']||'')!==inflow) return false;
     if(search){const h=((r['거래처명']||'')+(r['품목명(요약)']||'')+(r['견적명']||'')).toLowerCase();if(!h.includes(search))return false;}
 
-    // 기간 필터 적용
-    if(rangeStart||rangeEnd){
+    // 기간 필터 적용 (진행중은 기간 무관 항상 포함)
+    if((rangeStart||rangeEnd) && r._status !== 'pending'){
       const d=parseDate((r['일자-No.']||'').split(' ')[0]);
       if(!d) return false;
       if(rangeStart&&d<rangeStart) return false;
@@ -1515,23 +1516,31 @@ function closeTrendOutside(e) { if(e.target===document.getElementById('trendOver
 function renderTrendChart() {
   if (typeof Chart === 'undefined') { console.warn('Chart.js 아직 로딩중'); return; }
 
-  // 전체 allData 기준으로 월별 집계
+  // 월별 집계 - 성공/실패는 견적일 기준, 진행중은 기준월에만 표시
   const monthMap = {};
+  const thisKeyForPending = baseDate.getFullYear() + '/' + String(baseDate.getMonth()+1).padStart(2,'0');
+
   allData.forEach(r => {
+    if (r._status === 'pending') {
+      // 진행중은 기준일 월에만 카운트
+      if (!monthMap[thisKeyForPending]) monthMap[thisKeyForPending] = { success:0, fail:0, pending:0, successAmt:0, failAmt:0 };
+      monthMap[thisKeyForPending].pending++;
+      return;
+    }
     const d = parseDate((r['일자-No.']||'').split(' ')[0]);
     if (!d) return;
     const k = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0');
     if (!monthMap[k]) monthMap[k] = { success:0, fail:0, pending:0, successAmt:0, failAmt:0 };
     if (r._status==='success') { monthMap[k].success++; monthMap[k].successAmt+=(+r['금액합계(VAT포함)']||0); }
     else if (r._status==='fail') { monthMap[k].fail++; monthMap[k].failAmt+=(+r['금액합계(VAT포함)']||0); }
-    else monthMap[k].pending++;
   });
 
   const months = Object.keys(monthMap).sort();
   const labels = months.map(m => m.replace('/','.'));
-  const amtData    = months.map(m => Math.round(monthMap[m].successAmt/10000));
+  const amtData     = months.map(m => Math.round(monthMap[m].successAmt/10000));
   const successData = months.map(m => monthMap[m].success);
   const failData    = months.map(m => monthMap[m].fail);
+  const pendingData = months.map(m => monthMap[m].pending); // 기준월에만 값 있음
 
   // 기준일 기반 이번달/전월
   const thisKey = baseDate.getFullYear() + '/' + String(baseDate.getMonth()+1).padStart(2,'0');
@@ -1588,7 +1597,7 @@ function renderTrendChart() {
           borderColor: '#e8192c',
           borderWidth: 1.5,
           borderRadius: 4,
-          order: 3,
+          order: 4,
           yAxisID: 'y',
         },
         {
@@ -1617,6 +1626,20 @@ function renderTrendChart() {
           yAxisID: 'y2',
           order: 2,
           borderDash: [4,3],
+        },
+        {
+          label: '진행중',
+          data: pendingData,
+          type: 'line',
+          borderColor: '#f59e0b',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 5,
+          pointBackgroundColor: '#f59e0b',
+          pointStyle: 'rectRot',
+          tension: 0,
+          yAxisID: 'y2',
+          order: 3,
         }
       ]
     },
@@ -1631,7 +1654,8 @@ function renderTrendChart() {
             label: ctx => {
               if(ctx.datasetIndex===0) return ' 수주금액: ' + ctx.parsed.y + '만원';
               if(ctx.datasetIndex===1) return ' 성공: ' + ctx.parsed.y + '건';
-              return ' 실패: ' + ctx.parsed.y + '건';
+              if(ctx.datasetIndex===2) return ' 실패: ' + ctx.parsed.y + '건';
+              return ' 진행중: ' + ctx.parsed.y + '건';
             }
           }
         }
