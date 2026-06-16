@@ -483,6 +483,8 @@ const PIE_COLORS = ['#4f8ef7','#34c97a','#f5a623','#a78bfa','#f05252','#38bdf8',
 
 let allData = [];
 let filtered = [];
+let sortCol = null;   // 현재 정렬 컬럼
+let sortDir = 1;      // 1=오름차순, -1=내림차순
 let filters = { biz: 'all', period: 'all', status: 'all' };
 let baseDate = new Date();
 
@@ -776,6 +778,32 @@ function renderCharts() {
   document.getElementById('pieLegend').innerHTML = legendHtml;
 }
 
+// ── Sort ─────────────────────────────────────────────
+function sortBy(col) {
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = 1; }
+  renderTable();
+}
+
+function getSortVal(r, col) {
+  if (col === 'contact') {
+    const d = parseLastModDate(r['최종수정일시'] || '');
+    return d ? d.getTime() : 0;
+  }
+  if (col === 'deadline') {
+    const d = parseDate(r['수주예상일'] || '');
+    return d ? d.getTime() : 99999999999;
+  }
+  if (col === 'amount') return +(r['금액합계(VAT포함)'] || 0);
+  if (col === 'date') {
+    const d = parseDate((r['일자-No.'] || '').split(' ')[0]);
+    return d ? d.getTime() : 0;
+  }
+  if (col === 'company') return r['거래처명'] || '';
+  if (col === 'writer') return getWriter(r);
+  return '';
+}
+
 // ── Table ─────────────────────────────────────────────
 function renderTable() {
   document.getElementById('tableCount').textContent = `총 ${filtered.length}건`;
@@ -784,10 +812,33 @@ function renderTable() {
     return;
   }
 
+  // Sort filtered
+  if (sortCol) {
+    filtered = [...filtered].sort((a, b) => {
+      const va = getSortVal(a, sortCol), vb = getSortVal(b, sortCol);
+      if (va < vb) return -1 * sortDir;
+      if (va > vb) return 1 * sortDir;
+      return 0;
+    });
+  }
+
+  const sortIcon = (col) => {
+    if (sortCol !== col) return '<span style="opacity:0.3;margin-left:4px">⇅</span>';
+    return sortDir === 1 ? '<span style="color:var(--accent);margin-left:4px">↑</span>' : '<span style="color:var(--accent);margin-left:4px">↓</span>';
+  };
+  const th = (col, label) => `<th style="cursor:pointer;user-select:none" onclick="sortBy('${col}')">${label}${sortIcon(col)}</th>`;
+
   let html = `<table><thead><tr>
-    <th>일자</th><th>구분</th><th>거래처명</th><th>설비/품목</th>
-    <th>유입경로</th><th>금액</th><th>담당자</th>
-    <th>마지막 연락</th><th>수주예상일</th><th>상태</th>
+    ${th('date','일자')}
+    <th>구분</th>
+    ${th('company','거래처명')}
+    <th>설비/품목</th>
+    <th>유입경로</th>
+    ${th('amount','금액')}
+    ${th('writer','담당자')}
+    ${th('contact','마지막 연락')}
+    ${th('deadline','수주예상일')}
+    <th>상태</th>
   </tr></thead><tbody>`;
 
   filtered.forEach((r, idx) => {
@@ -800,7 +851,7 @@ function renderTable() {
     const deadlineDiff = deadlineDate ? Math.floor((deadlineDate - baseDate) / 86400000) : null;
 
     const contactBadge = contactBadgeHtml(contactDays);
-    const deadlineBadge = deadlineBadgeHtml(deadlineDiff, r._status);
+    const deadlineBadge = deadlineBadgeHtml(deadlineDiff, r._status, r['수주예상일']);
     const inflowBadge = inflowBadgeHtml(r['유입경로'] || '');
     const statusTag = statusTagHtml(r);
     const bizTag = r._biz === 'corp' ? '<span class="tag tag-corp">법인</span>' : '<span class="tag tag-person">개인</span>';
@@ -838,13 +889,15 @@ function contactBadgeHtml(days) {
   return `<span class="contact-badge over">${days}일 전 ⚠</span>`;
 }
 
-function deadlineBadgeHtml(diff, status) {
+function deadlineBadgeHtml(diff, status, dateStr) {
+  const date = dateStr ? dateStr.trim().replace(/\//g,'.').substring(2) : '';
   if (status === 'success') return '<span class="deadline-badge ok">✓ 수주완료</span>';
   if (status === 'fail') return '<span class="deadline-badge" style="background:rgba(240,82,82,0.1);color:var(--danger)">✗ 실패</span>';
   if (diff === null) return '<span class="deadline-badge">–</span>';
-  if (diff < 0) return `<span class="deadline-badge over">D+${Math.abs(diff)} 초과</span>`;
-  if (diff <= 7) return `<span class="deadline-badge near">D-${diff}</span>`;
-  return `<span class="deadline-badge ok">D-${diff}</span>`;
+  if (diff < 0) return `<span class="deadline-badge over" title="${date}">D+${Math.abs(diff)} 초과 ⚠</span>`;
+  if (diff === 0) return `<span class="deadline-badge over" title="${date}">오늘 마감 ⚠</span>`;
+  if (diff <= 7) return `<span class="deadline-badge near" title="${date}">D-${diff} <span style="opacity:0.6;font-size:10px">${date}</span></span>`;
+  return `<span class="deadline-badge ok">D-${diff} <span style="opacity:0.6;font-size:10px">${date}</span></span>`;
 }
 
 function inflowBadgeHtml(inflow) {
@@ -876,11 +929,13 @@ function openModal(idx) {
 
   const histories = parseHistory(r['견적결과(보고)'] || '');
 
+  const deadlineDateDisp = (r['수주예상일']||'').trim().replace(/\//g,'.').substring(2);
   let deadlineText = '–';
   if (deadlineDiff !== null) {
     if (r._status === 'success') deadlineText = '✓ 수주 완료';
-    else if (deadlineDiff < 0) deadlineText = `<span style="color:var(--danger)">D+${Math.abs(deadlineDiff)} 초과 ⚠</span>`;
-    else deadlineText = `D-${deadlineDiff}`;
+    else if (deadlineDiff < 0) deadlineText = `<span style="color:var(--danger)">D+${Math.abs(deadlineDiff)} 초과 ⚠<br><small>${deadlineDateDisp}</small></span>`;
+    else if (deadlineDiff === 0) deadlineText = `<span style="color:var(--danger)">오늘 마감 ⚠</span>`;
+    else deadlineText = `D-${deadlineDiff} <small style="color:var(--muted)">(${deadlineDateDisp})</small>`;
   }
 
   const bizTag = r._biz === 'corp' ? '<span class="tag tag-corp">법인</span>' : '<span class="tag tag-person">개인</span>';
