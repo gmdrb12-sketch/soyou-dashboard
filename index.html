@@ -1058,9 +1058,13 @@ function renderTable() {
 
 function parseLastModDate(str) {
   if (!str) return null;
-  const m = str.match(/(\d{4})\/(\d{2})\/(\d{2})/);
-  if (!m) return null;
-  return new Date(+m[1], +m[2]-1, +m[3]);
+  // 2026/06/15 형식
+  const m4 = str.match(/(\d{4})\/(\d{2})\/(\d{2})/);
+  if (m4) return new Date(+m4[1], +m4[2]-1, +m4[3]);
+  // 26/06/15 형식 (2자리 연도)
+  const m2 = str.match(/^(\d{2})\/(\d{2})\/(\d{2})/);
+  if (m2) return new Date(2000 + +m2[1], +m2[2]-1, +m2[3]);
+  return null;
 }
 
 function contactBadgeHtml(days) {
