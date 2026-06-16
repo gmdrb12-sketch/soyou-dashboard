@@ -1411,7 +1411,7 @@ function renderTable(){
   data.forEach(r=>{
     const gi=allData.indexOf(r);
     const ds=(r['일자-No.']||'').split(' ')[0];
-    const lm=parseLastMod(r['최종수정일시']||''); const cd=daysDiff(lm);
+    const lm=getLastContactDate(r); const cd=daysDiff(lm);
     const dd=parseDate(r['수주예상일']||''); const df=dd?Math.floor((dd-baseDate)/86400000):null;
     const ddS=(r['수주예상일']||'').trim().replace(/\//g,'.').slice(-5);
     const bizTag=r._biz==='corp'?'<span class="tag tag-corp">법인</span>':'<span class="tag tag-person">개인</span>';
