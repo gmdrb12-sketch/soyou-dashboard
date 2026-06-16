@@ -1211,8 +1211,8 @@ function applyFilters() {
   // 기간 필터
   const rsEl=document.getElementById('rangeStart');
   const reEl=document.getElementById('rangeEnd');
-  const rangeStart = rsEl&&rsEl.value ? new Date(rsEl.value) : null;
-  const rangeEnd   = reEl&&reEl.value ? new Date(reEl.value+'T23:59:59') : null;
+const rangeStart = rsEl&&rsEl.value ? new Date(rsEl.value+'T00:00:00') : null;
+const rangeEnd   = reEl&&reEl.value ? new Date(reEl.value+'T23:59:59') : null;
 
   // 기준일 월 (기간 미설정시 기준일 해당 월 기준)
   const baseMonth = baseDate.getFullYear()*100 + baseDate.getMonth();
