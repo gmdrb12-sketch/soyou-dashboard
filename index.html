@@ -499,6 +499,120 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 @media (max-width: 768px) {
   .update-wrap { display: none; }
 }
+.hdr-action-btn {
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); border-radius: 6px;
+  padding: 5px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+  white-space: nowrap;
+}
+.hdr-action-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ── TREND/INSIGHT MODAL ── */
+.big-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 2000;
+  align-items: flex-start; justify-content: center;
+  backdrop-filter: blur(8px);
+  overflow-y: auto; padding: 24px 16px;
+}
+.big-overlay.on { display: flex; }
+.big-modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 900px; max-width: 98vw;
+  padding: 28px 30px; position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  margin: auto;
+}
+.big-modal-x {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--muted); width: 28px; height: 28px;
+  border-radius: 50%; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+.big-modal-x:hover { color: var(--text); }
+.big-modal-title {
+  font-size: 18px; font-weight: 800; margin-bottom: 20px;
+  letter-spacing: -0.4px; display: flex; align-items: center; gap: 8px;
+}
+
+/* 추이 차트 */
+.trend-summary {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+.trend-stat {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px;
+}
+.trend-stat-lbl { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 4px; }
+.trend-stat-val { font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.trend-stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.trend-chart-wrap { position: relative; width: 100%; height: 260px; margin-bottom: 20px; }
+.trend-legend { display: flex; gap: 16px; margin-bottom: 14px; font-size: 12px; }
+.tl-item { display: flex; align-items: center; gap: 5px; color: var(--text2); }
+.tl-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* PDF 버튼 */
+.pdf-section {
+  border-top: 1px solid var(--border);
+  padding-top: 16px; margin-top: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pdf-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.pdf-check { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); cursor: pointer; }
+.pdf-check input { cursor: pointer; accent-color: var(--red); }
+.pdf-btns { display: flex; gap: 8px; }
+.pdf-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); border-radius: 6px;
+  padding: 7px 14px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.pdf-btn:hover { border-color: var(--red); color: var(--red); }
+.pdf-btn.primary { background: var(--red); color: #fff; border-color: var(--red); }
+.pdf-btn.primary:hover { opacity: 0.85; }
+
+/* 인사이트 */
+.insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.insight-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+}
+.insight-card-title {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+}
+.insight-card-title::before { content:''; width:3px; height:11px; background:var(--red); border-radius:2px; display:block; }
+.insight-bar-item { margin-bottom: 8px; }
+.insight-bar-head { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
+.insight-bar-name { color: var(--text2); }
+.insight-bar-rate { font-weight: 700; }
+.insight-bar-track { background: var(--surface3); border-radius: 3px; height: 5px; overflow: hidden; position: relative; }
+.insight-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.insight-bar-total { font-size: 10px; color: var(--muted); }
+
+.insight-summary {
+  background: var(--red-dim); border: 1px solid rgba(232,25,44,0.2);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 14px;
+}
+.insight-summary-title { font-size: 11px; font-weight: 700; color: var(--red); margin-bottom: 8px; letter-spacing: 0.3px; }
+.insight-summary-item { font-size: 13px; color: var(--text2); margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
+.insight-summary-item::before { content: '→'; color: var(--red); flex-shrink: 0; margin-top: 1px; }
+
+@media (max-width: 768px) {
+  .big-modal { padding: 20px 16px; }
+  .trend-summary { grid-template-columns: 1fr 1fr; }
+  .insight-grid { grid-template-columns: 1fr; }
+  .pdf-section { flex-direction: column; gap: 10px; align-items: flex-start; }
+  .hdr-action-btn { font-size: 11px; padding: 4px 8px; }
+}
+
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
@@ -621,6 +735,21 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
   .kpi-num { font-size: 26px; }
   .theme-toggle { display: none; }
 }
+
+@media print {
+  .hdr-right, .hdr-action-btn, .theme-toggle, .date-pill,
+  .big-overlay, .overlay, .filter-wrap,
+  .f-sep, .f-grp, .fb, .f-sel,
+  .sticky-top .report-section:last-child { display: none !important; }
+  .sticky-top { position: static !important; box-shadow: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .report-section { border: 1px solid #ddd !important; background: #fff !important; break-inside: avoid; margin-bottom: 12px; }
+  .kpi-cell { background: #f5f5f5 !important; }
+  .surface, .surface2, .surface3 { background: #fff !important; }
+  [data-theme="dark"] { --text: #000; --text2: #333; --muted: #666; --surface: #fff; --surface2: #f5f5f5; --border: #ddd; }
+  .section-label { color: #666 !important; }
+  .kpi-num { font-size: 28px !important; }
+}
 </style>
 </head>
 <body>
@@ -647,6 +776,10 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
     </div>
   </div>
   <div class="hdr-right">
+    <div style="display:flex;gap:6px;">
+      <button class="hdr-action-btn" onclick="openTrendModal()">📊 월별 추이</button>
+      <button class="hdr-action-btn" onclick="openInsightModal()">💡 인사이트</button>
+    </div>
     <div class="theme-toggle">
       <button class="theme-btn active" id="btnDark" onclick="setTheme('dark')">🌙 다크</button>
       <button class="theme-btn" id="btnLight" onclick="setTheme('light')">☀️ 라이트</button>
@@ -804,6 +937,68 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
   <div class="modal" id="modalBox">
     <button class="modal-x" onclick="closeModal()">✕</button>
     <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- 월별 추이 모달 -->
+<div class="big-overlay" id="trendOverlay" onclick="closeTrendOutside(event)">
+  <div class="big-modal">
+    <button class="big-modal-x" onclick="closeTrendModal()">✕</button>
+    <div class="big-modal-title">📊 월별 수주 추이</div>
+
+    <div class="trend-summary">
+      <div class="trend-stat">
+        <div class="trend-stat-lbl">이번달 수주</div>
+        <div class="trend-stat-val" id="trendThisMonth" style="color:var(--green)">–</div>
+        <div class="trend-stat-sub" id="trendThisAmt">–</div>
+      </div>
+      <div class="trend-stat">
+        <div class="trend-stat-lbl">전월 대비</div>
+        <div class="trend-stat-val" id="trendMoM">–</div>
+        <div class="trend-stat-sub" id="trendMoMSub">–</div>
+      </div>
+      <div class="trend-stat">
+        <div class="trend-stat-lbl">누적 수주성공률</div>
+        <div class="trend-stat-val" id="trendRate" style="color:var(--yellow)">–</div>
+        <div class="trend-stat-sub" id="trendRateSub">–</div>
+      </div>
+    </div>
+
+    <div class="trend-legend">
+      <div class="tl-item"><div class="tl-dot" style="background:var(--red)"></div>수주금액</div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--blue);border-radius:50%"></div>견적건수</div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--green);border-radius:50%"></div>성공건수</div>
+    </div>
+    <div class="trend-chart-wrap">
+      <canvas id="trendChart" role="img" aria-label="월별 수주 추이 차트">월별 수주 추이</canvas>
+    </div>
+
+    <div class="pdf-section">
+      <div class="pdf-options">
+        <label class="pdf-check"><input type="checkbox" id="pdfKpi" checked> 전체현황</label>
+        <label class="pdf-check"><input type="checkbox" id="pdfUrgent" checked> 긴급알림</label>
+        <label class="pdf-check"><input type="checkbox" id="pdfWriter" checked> 담당자현황</label>
+        <label class="pdf-check"><input type="checkbox" id="pdfTrend" checked> 월별추이</label>
+        <label class="pdf-check"><input type="checkbox" id="pdfTable"> 견적전체목록</label>
+      </div>
+      <div class="pdf-btns">
+        <button class="pdf-btn" onclick="window.print()">🖨 인쇄</button>
+        <button class="pdf-btn primary" onclick="exportPDF()">📄 PDF 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 인사이트 모달 -->
+<div class="big-overlay" id="insightOverlay" onclick="closeInsightOutside(event)">
+  <div class="big-modal">
+    <button class="big-modal-x" onclick="closeInsightModal()">✕</button>
+    <div class="big-modal-title">💡 수주 성공률 인사이트</div>
+    <div id="insightSummaryBox" class="insight-summary" style="display:none">
+      <div class="insight-summary-title">📌 핵심 인사이트</div>
+      <div id="insightSummaryList"></div>
+    </div>
+    <div class="insight-grid" id="insightGrid"></div>
   </div>
 </div>
 
@@ -1256,6 +1451,256 @@ function parseHist(text){
 function closeModal(){document.getElementById('modalOverlay').classList.remove('on');}
 function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
 
+
+// ── TREND MODAL ──────────────────────────────────────
+function openTrendModal() {
+  renderTrendChart();
+  document.getElementById('trendOverlay').classList.add('on');
+}
+function closeTrendModal() { document.getElementById('trendOverlay').classList.remove('on'); }
+function closeTrendOutside(e) { if(e.target===document.getElementById('trendOverlay')) closeTrendModal(); }
+
+function renderTrendChart() {
+  // 월별 데이터 집계 (전체 데이터 기준)
+  const monthMap = {};
+  allData.forEach(r => {
+    const d = parseDate((r['일자-No.']||'').split(' ')[0]);
+    if (!d) return;
+    const k = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0');
+    if (!monthMap[k]) monthMap[k] = { success:0, fail:0, pending:0, amt:0, successAmt:0 };
+    monthMap[k].amt += (+r['금액합계(VAT포함)']||0);
+    if (r._status==='success') { monthMap[k].success++; monthMap[k].successAmt+=(+r['금액합계(VAT포함)']||0); }
+    else if (r._status==='fail') monthMap[k].fail++;
+    else monthMap[k].pending++;
+  });
+
+  const months = Object.keys(monthMap).sort();
+  const labels = months.map(m => m.replace('/','.'));
+  const amtData = months.map(m => Math.round(monthMap[m].successAmt/10000));
+  const totalData = months.map(m => monthMap[m].success + monthMap[m].fail + monthMap[m].pending);
+  const successData = months.map(m => monthMap[m].success);
+
+  // 이번달 통계
+  const now = new Date();
+  const thisKey = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2,'0');
+  const prevKey = months[months.indexOf(thisKey)-1];
+  const thisD = monthMap[thisKey] || {success:0,fail:0,pending:0,successAmt:0};
+  const prevD = monthMap[prevKey] || {success:0,fail:0,pending:0,successAmt:0};
+
+  document.getElementById('trendThisMonth').textContent = thisD.success + '건';
+  document.getElementById('trendThisAmt').textContent = fmtAmt(thisD.successAmt);
+
+  const mom = prevD.successAmt > 0 ? Math.round((thisD.successAmt - prevD.successAmt)/prevD.successAmt*100) : 0;
+  const momEl = document.getElementById('trendMoM');
+  momEl.textContent = (mom >= 0 ? '+' : '') + mom + '%';
+  momEl.style.color = mom >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('trendMoMSub').textContent = '전월 ' + fmtAmt(prevD.successAmt);
+
+  const totalS = allData.filter(r=>r._status==='success').length;
+  const totalAll = allData.length;
+  const rate = totalAll ? Math.round(totalS/totalAll*100) : 0;
+  document.getElementById('trendRate').textContent = rate + '%';
+  document.getElementById('trendRateSub').textContent = `전체 ${totalAll}건 중 ${totalS}건 성공`;
+
+  // 차트
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+
+  const existing = Chart.getChart('trendChart');
+  if (existing) existing.destroy();
+
+  new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '수주금액(만원)',
+          data: amtData,
+          backgroundColor: 'rgba(232,25,44,0.18)',
+          borderColor: '#e8192c',
+          borderWidth: 1.5,
+          borderRadius: 4,
+          order: 3,
+        },
+        {
+          label: '견적건수',
+          data: totalData,
+          type: 'line',
+          borderColor: '#3b82f6',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 4,
+          pointBackgroundColor: '#3b82f6',
+          tension: 0.3,
+          yAxisID: 'y2',
+          order: 1,
+          borderDash: [4,3],
+        },
+        {
+          label: '성공건수',
+          data: successData,
+          type: 'line',
+          borderColor: '#22c55e',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#22c55e',
+          tension: 0.3,
+          yAxisID: 'y2',
+          order: 2,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: {
+          grid: { color: gridColor },
+          ticks: { color: textColor, font: { size: 11 }, autoSkip: false, maxRotation: 45 }
+        },
+        y: {
+          grid: { color: gridColor },
+          ticks: { color: textColor, font: { size: 11 }, callback: v => Math.round(v) + '만' },
+          position: 'left', title: { display: true, text: '수주금액(만원)', color: textColor, font: {size:10} }
+        },
+        y2: {
+          grid: { display: false },
+          ticks: { color: textColor, font: { size: 11 }, callback: v => v + '건', stepSize: 1 },
+          position: 'right',
+          title: { display: true, text: '건수', color: textColor, font: {size:10} }
+        }
+      }
+    }
+  });
+}
+
+// ── PDF ──────────────────────────────────────────────
+function exportPDF() {
+  window.print();
+}
+
+// ── INSIGHT MODAL ────────────────────────────────────
+function openInsightModal() {
+  renderInsight();
+  document.getElementById('insightOverlay').classList.add('on');
+}
+function closeInsightModal() { document.getElementById('insightOverlay').classList.remove('on'); }
+function closeInsightOutside(e) { if(e.target===document.getElementById('insightOverlay')) closeInsightModal(); }
+
+function renderInsight() {
+  const success = allData.filter(r=>r._status==='success');
+  const fail = allData.filter(r=>r._status==='fail');
+  const closed = [...success, ...fail]; // 결론 난 건
+
+  function rateBar(items, keyFn, colorFn) {
+    const map = {};
+    items.forEach(r => {
+      const k = keyFn(r);
+      if (!k) return;
+      if (!map[k]) map[k] = {s:0,f:0};
+      if (r._status==='success') map[k].s++; else map[k].f++;
+    });
+    return Object.entries(map)
+      .map(([k,d]) => ({ name:k, s:d.s, f:d.f, total:d.s+d.f, rate: Math.round(d.s/(d.s+d.f)*100) }))
+      .filter(d => d.total >= 1)
+      .sort((a,b) => b.rate - a.rate);
+  }
+
+  // 1. 유입경로별
+  const inflowData = rateBar(closed, r => getInflowGroup(r['유입경로']||''));
+  const inflowLabels = { youtube:'유튜브', blog:'블로그', carrot:'당근마켓', online:'인터넷인입', offline:'오프라인영업', etc:'기타' };
+
+  // 2. 담당자별
+  const writerData = rateBar(closed, r => getWriter(r));
+
+  // 3. 금액대별
+  const amtData = rateBar(closed, r => {
+    const a = +r['금액합계(VAT포함)']||0;
+    if (a < 1000000) return '100만 미만';
+    if (a < 5000000) return '100~500만';
+    if (a < 10000000) return '500만~1천만';
+    if (a < 30000000) return '1천만~3천만';
+    return '3천만 이상';
+  });
+
+  // 4. 설비유형별
+  const equipData = rateBar(closed, r => getProdType(r));
+
+  function makeBarHtml(items, labelMap) {
+    if (!items.length) return '<div style="color:var(--muted);font-size:12px">데이터 부족</div>';
+    return items.map(d => {
+      const label = labelMap ? (labelMap[d.name]||d.name) : d.name;
+      const color = d.rate >= 50 ? 'var(--green)' : d.rate >= 30 ? 'var(--yellow)' : 'var(--red)';
+      return `<div class="insight-bar-item">
+        <div class="insight-bar-head">
+          <span class="insight-bar-name">${label}</span>
+          <span class="insight-bar-rate" style="color:${color}">${d.rate}% <span class="insight-bar-total">(${d.s}/${d.total}건)</span></span>
+        </div>
+        <div class="insight-bar-track">
+          <div class="insight-bar-fill" style="width:${d.rate}%;background:${color}"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('insightGrid').innerHTML = `
+    <div class="insight-card">
+      <div class="insight-card-title">유입경로별 성공률</div>
+      ${makeBarHtml(inflowData, inflowLabels)}
+    </div>
+    <div class="insight-card">
+      <div class="insight-card-title">담당자별 성공률</div>
+      ${makeBarHtml(writerData, null)}
+    </div>
+    <div class="insight-card">
+      <div class="insight-card-title">금액대별 성공률</div>
+      ${makeBarHtml(amtData, null)}
+    </div>
+    <div class="insight-card">
+      <div class="insight-card-title">설비 유형별 성공률</div>
+      ${makeBarHtml(equipData, null)}
+    </div>
+  `;
+
+  // 핵심 인사이트 자동 생성
+  const insights = [];
+  const allClosed = closed.length;
+  if (!allClosed) { document.getElementById('insightSummaryBox').style.display='none'; return; }
+
+  // 최고 성공률 유입경로
+  if (inflowData.length) {
+    const best = inflowData[0];
+    insights.push(`<strong>${inflowLabels[best.name]||best.name}</strong> 유입이 성공률 ${best.rate}%로 가장 높아요 (${best.s}/${best.total}건)`);
+  }
+  // 최고 성공률 담당자
+  if (writerData.length >= 2) {
+    const best = writerData[0];
+    insights.push(`담당자 <strong>${best.name}</strong>의 성공률이 ${best.rate}%로 가장 높아요 — 어떤 점이 다른지 파악해보세요`);
+  }
+  // 금액대
+  if (amtData.length) {
+    const best = amtData.sort((a,b)=>b.rate-a.rate)[0];
+    insights.push(`<strong>${best.name}</strong> 금액대 견적이 성공률 ${best.rate}%로 가장 높아요`);
+  }
+  // 전체 성공률
+  const overallRate = Math.round(success.length/allData.length*100);
+  if (overallRate < 30) {
+    insights.push(`전체 수주 성공률이 ${overallRate}%예요 — 아직 데이터가 쌓이는 중이니 추이를 지켜보세요`);
+  }
+
+  if (insights.length) {
+    document.getElementById('insightSummaryBox').style.display='block';
+    document.getElementById('insightSummaryList').innerHTML = insights.map(t=>`<div class="insight-summary-item">${t}</div>`).join('');
+  }
+}
+
 // ── Init ──
 document.addEventListener('DOMContentLoaded',()=>{
   const saved=localStorage.getItem('soyuTheme')||'dark';
@@ -1266,5 +1711,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   loadAll();
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </body>
 </html>
