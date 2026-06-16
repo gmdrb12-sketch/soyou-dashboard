@@ -1806,7 +1806,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   const saved=localStorage.getItem('soyuTheme')||'dark';
   setTheme(saved);
   document.getElementById('baseDate').value=fmt(new Date());
-  document.getElementById('baseDate').addEventListener('change',applyFilters);
+  setMonthRange(new Date()); // 초기 기간 자동 세팅
+  document.getElementById('baseDate').addEventListener('change', () => {
+    const bd = document.getElementById('baseDate').value;
+    if(bd) { baseDate = new Date(bd); setMonthRange(baseDate); }
+    applyFilters();
+  });
   document.getElementById('rangeStart').addEventListener('change',applyFilters);
   document.getElementById('rangeEnd').addEventListener('change',applyFilters);
 
