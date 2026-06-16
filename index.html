@@ -182,7 +182,7 @@ body {
 
 .kpi-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .kpi-lbl { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
-.kpi-pct { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 10px; }
+.kpi-pct { font-size: 15px; font-weight: 800; padding: 3px 9px; border-radius: 10px; }
 .k-all .kpi-pct { background: var(--red-dim); color: var(--red); }
 .k-s .kpi-pct { background: var(--green-dim); color: var(--green); }
 .k-p .kpi-pct { background: var(--yellow-dim); color: var(--yellow); }
@@ -305,12 +305,12 @@ body {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .f-grp { display: flex; align-items: center; gap: 5px; }
-.f-lbl { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; }
+.f-lbl { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; }
 .f-sep { width: 1px; height: 16px; background: var(--border2); margin: 0 2px; flex-shrink: 0; }
 .fb {
   background: transparent; border: 1px solid var(--border2);
   color: var(--text2); border-radius: 20px;
-  padding: 3px 10px; font-size: 11px; font-weight: 500;
+  padding: 6px 14px; font-size: 14px; font-weight: 500;
   cursor: pointer; font-family: inherit; transition: all 0.12s;
   white-space: nowrap;
 }
@@ -322,8 +322,8 @@ body {
 .f-sel {
   background: var(--surface2); border: 1px solid var(--border2);
   color: var(--text); border-radius: 6px;
-  padding: 3px 8px; font-size: 11px;
-  cursor: pointer; font-family: inherit; outline: none; height: 26px;
+  padding: 5px 10px; font-size: 14px;
+  cursor: pointer; font-family: inherit; outline: none; height: 34px;
 }
 
 /* ── MAIN TABLE ── */
@@ -468,6 +468,53 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
+/* ── INFLOW CHART ── */
+.inflow-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.inflow-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.inflow-card:hover { border-color: var(--border2); }
+.inflow-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+}
+.ic-yt::after { background: #ff4444; }
+.ic-blog::after { background: var(--purple); }
+.ic-carrot::after { background: #ff6b00; }
+.ic-online::after { background: var(--blue); }
+.ic-offline::after { background: var(--green); }
+.ic-etc::after { background: var(--muted); }
+
+.ic-icon { font-size: 18px; margin-bottom: 6px; }
+.ic-label { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.3px; margin-bottom: 6px; }
+.ic-count { font-size: 26px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.ic-yt .ic-count { color: #ff4444; }
+.ic-blog .ic-count { color: var(--purple); }
+.ic-carrot .ic-count { color: #ff6b00; }
+.ic-online .ic-count { color: var(--blue); }
+.ic-offline .ic-count { color: var(--green); }
+.ic-etc .ic-count { color: var(--muted); }
+.ic-amt { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.ic-amt strong { color: var(--text2); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .inflow-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .ic-count { font-size: 22px; }
+}
+@media (max-width: 420px) {
+  .inflow-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ── STICKY TOP ── */
 .sticky-top {
   position: sticky;
@@ -590,7 +637,7 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
             <div class="kpi-amt">합계 <strong id="kS-amt">–</strong></div>
           </div>
           <div class="kpi-cell k-p">
-            <div class="kpi-top"><span class="kpi-lbl">가망 (대기)</span><span class="kpi-pct" id="kP-pct">–</span></div>
+            <div class="kpi-top"><span class="kpi-lbl">진행중</span><span class="kpi-pct" id="kP-pct">–</span></div>
             <div class="kpi-num" id="kP-cnt">–<span class="kpi-unit">건</span></div>
             <div class="kpi-amt">합계 <strong id="kP-amt">–</strong></div>
           </div>
@@ -624,7 +671,7 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
             <span class="f-lbl">상태</span>
             <button class="fb on cr" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">전체</button>
             <button class="fb" data-filter="status" data-val="success" onclick="setFilter('status','success',this)">성공</button>
-            <button class="fb" data-filter="status" data-val="pending" onclick="setFilter('status','pending',this)">가망</button>
+            <button class="fb" data-filter="status" data-val="pending" onclick="setFilter('status','pending',this)">진행중</button>
             <button class="fb" data-filter="status" data-val="fail" onclick="setFilter('status','fail',this)">실패</button>
           </div>
           <div class="f-sep"></div>
@@ -666,7 +713,7 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
       <table class="writer-table">
         <thead><tr>
           <th>담당자</th><th>전체</th>
-          <th>성공</th><th>가망</th><th>실패</th>
+          <th>성공</th><th>진행중</th><th>실패</th>
           <th>현황</th><th>총 금액</th>
         </tr></thead>
         <tbody id="writerTbody"></tbody>
@@ -679,7 +726,13 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
       <div id="equipChart"></div>
     </div>
 
-    <!-- 6. 견적 전체 내역 -->
+    <!-- 6. 유입경로 현황 -->
+    <div class="report-section">
+      <div class="section-label">유입경로 현황</div>
+      <div id="inflowChart"></div>
+    </div>
+
+    <!-- 7. 견적 전체 내역 -->
     <div class="report-section">
       <div class="section-label">견적 전체 내역</div>
       <div class="tbl-header">
@@ -766,6 +819,48 @@ function fmtAmt(n) {
   return n.toLocaleString()+'원';
 }
 function getWriter(r) { return (r['작성자']||r['마지막수정자']||'').replace(/ (대리|이사|주임|팀장|과장|사원|부장)/g,'').trim(); }
+function getInflowGroup(inflow) {
+  const s = (inflow||'').trim().toLowerCase();
+  if (s.includes('유튜브')) return 'youtube';
+  if (s.includes('블로그')) return 'blog';
+  if (s.includes('당근')) return 'carrot';
+  if (s.includes('다소유')||s.includes('홈페이지')||s.includes('인터넷')||s.includes('ai검색')||s.includes('소유쇼핑몰')||s.includes('온라인')||s.includes('파워링크')||s.includes('네이버')) return 'online';
+  if (s.includes('기존고객')||s.includes('오프라인')||s.includes('유선')||s.includes('개인카톡')||s.includes('카톡')) return 'offline';
+  if (!s || s === '') return 'etc';
+  return 'etc';
+}
+
+const INFLOW_META = {
+  youtube:  { label: '유튜브',      icon: '▶', cls: 'ic-yt' },
+  blog:     { label: '블로그',      icon: '✍', cls: 'ic-blog' },
+  carrot:   { label: '당근마켓',    icon: '🥕', cls: 'ic-carrot' },
+  online:   { label: '인터넷 인입', icon: '🌐', cls: 'ic-online' },
+  offline:  { label: '오프라인 영업', icon: '🤝', cls: 'ic-offline' },
+  etc:      { label: '기타',        icon: '•',  cls: 'ic-etc' },
+};
+
+function renderInflow() {
+  const map = { youtube:{cnt:0,amt:0}, blog:{cnt:0,amt:0}, carrot:{cnt:0,amt:0}, online:{cnt:0,amt:0}, offline:{cnt:0,amt:0}, etc:{cnt:0,amt:0} };
+  filtered.forEach(r => {
+    const g = getInflowGroup(r['유입경로']||'');
+    map[g].cnt++;
+    map[g].amt += (+r['금액합계(VAT포함)']||0);
+  });
+  const el = document.getElementById('inflowChart');
+  if (!el) return;
+  el.innerHTML = `<div class="inflow-grid">${
+    Object.entries(map).map(([key, d]) => {
+      const m = INFLOW_META[key];
+      return `<div class="inflow-card ${m.cls}">
+        <div class="ic-icon">${m.icon}</div>
+        <div class="ic-label">${m.label}</div>
+        <div class="ic-count">${d.cnt}<span style="font-size:14px;font-weight:600;margin-left:2px">건</span></div>
+        <div class="ic-amt">합계 <strong>${fmtAmt(d.amt)}</strong></div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+
 function getProdType(r) {
   const n=(r['품목명(요약)']||r['견적명']||'').toLowerCase();
   if(n.includes('랩핑')) return '랩핑기';
@@ -841,7 +936,7 @@ function applyFilters() {
     return true;
   });
 
-  renderKPI(); renderUrgent(); renderWriter(); renderEquip(); renderTable();
+  renderKPI(); renderUrgent(); renderWriter(); renderEquip(); renderInflow(); renderTable();
 }
 
 // ── KPI ──
@@ -1021,7 +1116,7 @@ function renderTable(){
     else db=`<span class="db db-ok">D-${df}<div class="db-date">${ddS}</div></span>`;
     if(r._status==='success') stag='<span class="tag tag-success">✓ 성공</span>';
     else if(r._status==='fail') stag='<span class="tag tag-fail">✗ 실패</span>';
-    else stag=r._period==='long'?'<span class="tag tag-pl">장기가망</span>':'<span class="tag tag-ps">단기가망</span>';
+    else stag=r._period==='long'?'<span class="tag tag-pl">진행중</span>':'<span class="tag tag-ps">진행중</span>';
 
     html+=`<tr onclick="openModalByRow(${gi})">
       <td class="td-date hide-m" data-label="일자">${ds}</td>
@@ -1056,7 +1151,7 @@ function openModalContent(r){
   let sTag;
   if(r._status==='success') sTag='<span class="tag tag-success">✓ 성공</span>';
   else if(r._status==='fail') sTag='<span class="tag tag-fail">✗ 실패</span>';
-  else sTag=r._period==='long'?'<span class="tag tag-pl">장기가망</span>':'<span class="tag tag-ps">단기가망</span>';
+  else sTag=r._period==='long'?'<span class="tag tag-pl">진행중</span>':'<span class="tag tag-ps">진행중</span>';
   const inf=r['유입경로']||'';
   const ic=inf.includes('유튜브')?'ifl-yt':inf.includes('다소유')?'ifl-da':inf.includes('블로그')?'ifl-bl':(inf.includes('쇼핑몰')||inf.includes('홈페이지'))?'ifl-sh':inf.includes('기존')?'ifl-ex':'ifl-et';
   const hists=parseHist(r['견적결과(보고)']||'');
