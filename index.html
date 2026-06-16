@@ -788,7 +788,7 @@ function parseCSV(text, tabName) {
   const raw=text.split('\n'); const lines=[]; let cur='',inQ=false;
   for(const l of raw){ for(const c of l){if(c==='"')inQ=!inQ;} cur+=(cur?'\n':'')+l; if(!inQ){lines.push(cur);cur='';} }
   if(cur) lines.push(cur);
-  const meta=TABS[tabName]; const o=(tabName==='개인단기')?1:0; const rows=[];
+  const meta=TABS[tabName]; const o=tabName.startsWith('개인')?1:0; const rows=[];
   for(const line of lines){
     const v=csvLine(line); if(!v||v.length<10) continue;
     const d=cl(v[0]), co=cl(v[2+o]);
