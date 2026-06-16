@@ -468,8 +468,23 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
+/* ── STICKY TOP ── */
+.sticky-top {
+  position: sticky;
+  top: 54px;
+  z-index: 100;
+  background: var(--bg);
+}
+.sticky-top .report-section {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+[data-theme="light"] .sticky-top .report-section {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
 /* ── MOBILE ── */
 @media (max-width: 768px) {
+  .sticky-top { top: 50px; }
   .hdr { padding: 0 14px; height: 50px; }
   .hdr-divider, .hdr-subtitle { display: none; }
   .date-pill label { display: none; }
@@ -557,70 +572,75 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 
   <div id="dashContent" style="display:none">
 
-    <!-- 1. 전체 현황 -->
-    <div class="report-section">
-      <div class="section-label">전체 현황</div>
-      <div class="kpi-row">
-        <div class="kpi-cell k-all">
-          <div class="kpi-top"><span class="kpi-lbl">전체 견적</span><span class="kpi-pct" id="kT-pct">전체</span></div>
-          <div class="kpi-num" id="kT-cnt">–<span class="kpi-unit">건</span></div>
-          <div class="kpi-amt">합계 <strong id="kT-amt">–</strong></div>
-        </div>
-        <div class="kpi-cell k-s">
-          <div class="kpi-top"><span class="kpi-lbl">수주 성공</span><span class="kpi-pct" id="kS-pct">–</span></div>
-          <div class="kpi-num" id="kS-cnt">–<span class="kpi-unit">건</span></div>
-          <div class="kpi-amt">합계 <strong id="kS-amt">–</strong></div>
-        </div>
-        <div class="kpi-cell k-p">
-          <div class="kpi-top"><span class="kpi-lbl">가망 (대기)</span><span class="kpi-pct" id="kP-pct">–</span></div>
-          <div class="kpi-num" id="kP-cnt">–<span class="kpi-unit">건</span></div>
-          <div class="kpi-amt">합계 <strong id="kP-amt">–</strong></div>
-        </div>
-        <div class="kpi-cell k-f">
-          <div class="kpi-top"><span class="kpi-lbl">수주 실패</span><span class="kpi-pct" id="kF-pct">–</span></div>
-          <div class="kpi-num" id="kF-cnt">–<span class="kpi-unit">건</span></div>
-          <div class="kpi-amt">합계 <strong id="kF-amt">–</strong></div>
-        </div>
-      </div>
-    </div>
+    <!-- 고정 영역: 전체현황 + 필터 -->
+    <div class="sticky-top">
 
-    <!-- 2. 필터 -->
-    <div class="report-section">
-      <div class="section-label">필터</div>
-      <div class="filter-row">
-        <div class="f-grp">
-          <span class="f-lbl">사업자</span>
-          <button class="fb on cr" data-filter="biz" data-val="all" onclick="setFilter('biz','all',this)">전체</button>
-          <button class="fb" data-filter="biz" data-val="corp" onclick="setFilter('biz','corp',this)">법인</button>
-          <button class="fb" data-filter="biz" data-val="person" onclick="setFilter('biz','person',this)">개인</button>
-        </div>
-        <div class="f-sep"></div>
-        <div class="f-grp">
-          <span class="f-lbl">기간</span>
-          <button class="fb on cr" data-filter="period" data-val="all" onclick="setFilter('period','all',this)">전체</button>
-          <button class="fb" data-filter="period" data-val="short" onclick="setFilter('period','short',this)">단기</button>
-          <button class="fb" data-filter="period" data-val="long" onclick="setFilter('period','long',this)">장기</button>
-        </div>
-        <div class="f-sep"></div>
-        <div class="f-grp">
-          <span class="f-lbl">상태</span>
-          <button class="fb on cr" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">전체</button>
-          <button class="fb" data-filter="status" data-val="success" onclick="setFilter('status','success',this)">성공</button>
-          <button class="fb" data-filter="status" data-val="pending" onclick="setFilter('status','pending',this)">가망</button>
-          <button class="fb" data-filter="status" data-val="fail" onclick="setFilter('status','fail',this)">실패</button>
-        </div>
-        <div class="f-sep"></div>
-        <div class="f-grp">
-          <span class="f-lbl">담당자</span>
-          <select class="f-sel" id="writerFilter" onchange="applyFilters()"><option value="all">전체</option></select>
-        </div>
-        <div class="f-sep"></div>
-        <div class="f-grp">
-          <span class="f-lbl">유입</span>
-          <select class="f-sel" id="inflowFilter" onchange="applyFilters()"><option value="all">전체</option></select>
+      <!-- 1. 전체 현황 -->
+      <div class="report-section">
+        <div class="section-label">전체 현황</div>
+        <div class="kpi-row">
+          <div class="kpi-cell k-all">
+            <div class="kpi-top"><span class="kpi-lbl">전체 견적</span><span class="kpi-pct" id="kT-pct">전체</span></div>
+            <div class="kpi-num" id="kT-cnt">–<span class="kpi-unit">건</span></div>
+            <div class="kpi-amt">합계 <strong id="kT-amt">–</strong></div>
+          </div>
+          <div class="kpi-cell k-s">
+            <div class="kpi-top"><span class="kpi-lbl">수주 성공</span><span class="kpi-pct" id="kS-pct">–</span></div>
+            <div class="kpi-num" id="kS-cnt">–<span class="kpi-unit">건</span></div>
+            <div class="kpi-amt">합계 <strong id="kS-amt">–</strong></div>
+          </div>
+          <div class="kpi-cell k-p">
+            <div class="kpi-top"><span class="kpi-lbl">가망 (대기)</span><span class="kpi-pct" id="kP-pct">–</span></div>
+            <div class="kpi-num" id="kP-cnt">–<span class="kpi-unit">건</span></div>
+            <div class="kpi-amt">합계 <strong id="kP-amt">–</strong></div>
+          </div>
+          <div class="kpi-cell k-f">
+            <div class="kpi-top"><span class="kpi-lbl">수주 실패</span><span class="kpi-pct" id="kF-pct">–</span></div>
+            <div class="kpi-num" id="kF-cnt">–<span class="kpi-unit">건</span></div>
+            <div class="kpi-amt">합계 <strong id="kF-amt">–</strong></div>
+          </div>
         </div>
       </div>
-    </div>
+
+      <!-- 2. 필터 -->
+      <div class="report-section">
+        <div class="section-label">필터</div>
+        <div class="filter-row">
+          <div class="f-grp">
+            <span class="f-lbl">사업자</span>
+            <button class="fb on cr" data-filter="biz" data-val="all" onclick="setFilter('biz','all',this)">전체</button>
+            <button class="fb" data-filter="biz" data-val="corp" onclick="setFilter('biz','corp',this)">법인</button>
+            <button class="fb" data-filter="biz" data-val="person" onclick="setFilter('biz','person',this)">개인</button>
+          </div>
+          <div class="f-sep"></div>
+          <div class="f-grp">
+            <span class="f-lbl">기간</span>
+            <button class="fb on cr" data-filter="period" data-val="all" onclick="setFilter('period','all',this)">전체</button>
+            <button class="fb" data-filter="period" data-val="short" onclick="setFilter('period','short',this)">단기</button>
+            <button class="fb" data-filter="period" data-val="long" onclick="setFilter('period','long',this)">장기</button>
+          </div>
+          <div class="f-sep"></div>
+          <div class="f-grp">
+            <span class="f-lbl">상태</span>
+            <button class="fb on cr" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">전체</button>
+            <button class="fb" data-filter="status" data-val="success" onclick="setFilter('status','success',this)">성공</button>
+            <button class="fb" data-filter="status" data-val="pending" onclick="setFilter('status','pending',this)">가망</button>
+            <button class="fb" data-filter="status" data-val="fail" onclick="setFilter('status','fail',this)">실패</button>
+          </div>
+          <div class="f-sep"></div>
+          <div class="f-grp">
+            <span class="f-lbl">담당자</span>
+            <select class="f-sel" id="writerFilter" onchange="applyFilters()"><option value="all">전체</option></select>
+          </div>
+          <div class="f-sep"></div>
+          <div class="f-grp">
+            <span class="f-lbl">유입</span>
+            <select class="f-sel" id="inflowFilter" onchange="applyFilters()"><option value="all">전체</option></select>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sticky-top -->
 
     <!-- 3. 긴급 알림 -->
     <div class="report-section">
