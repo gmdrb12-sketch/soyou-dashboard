@@ -1180,7 +1180,6 @@ async function loadAll() {
   infs.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;iSel.appendChild(o);});
   document.getElementById('loadingView').style.display='none';
   document.getElementById('dashContent').style.display='block';
-  applyFilters();
 }
 
 // ── Filter ──
@@ -1806,7 +1805,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   const saved=localStorage.getItem('soyuTheme')||'dark';
   setTheme(saved);
   document.getElementById('baseDate').value=fmt(new Date());
-  setMonthRange(new Date()); // 초기 기간 자동 세팅
   document.getElementById('baseDate').addEventListener('change', () => {
     const bd = document.getElementById('baseDate').value;
     if(bd) { baseDate = new Date(bd); setMonthRange(baseDate); }
@@ -1815,7 +1813,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('rangeStart').addEventListener('change',applyFilters);
   document.getElementById('rangeEnd').addEventListener('change',applyFilters);
 
-  loadAll();
+  loadAll().then(()=>{
+    setMonthRange(baseDate);
+    applyFilters();
+  });
 });
 </script>
 </body>
