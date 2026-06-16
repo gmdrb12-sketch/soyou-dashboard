@@ -499,6 +499,91 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ── Mobile Responsive ── */
+  @media (max-width: 768px) {
+    .header { padding: 0 16px; height: 52px; }
+    .logo-sub { display: none; }
+    .date-control label { display: none; }
+    .main { padding: 14px 12px; }
+
+    .kpi-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .kpi-card { padding: 14px 14px; }
+    .kpi-count { font-size: 28px; }
+    .kpi-amount { font-size: 11px; }
+
+    .filter-bar {
+      padding: 10px 12px;
+      gap: 8px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-section { flex-shrink: 0; }
+    .filter-divider { flex-shrink: 0; }
+
+    .charts-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .pie-container { flex-direction: column; align-items: flex-start; gap: 14px; }
+
+    /* 테이블 → 카드형으로 변환 */
+    .table-header { padding: 12px 14px; }
+    .search-input { width: 160px; }
+
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+
+    tbody tr {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 8px 10px;
+      padding: 14px;
+      background: var(--surface2);
+      cursor: pointer;
+    }
+    tbody tr:hover { background: var(--surface3); }
+    tbody td {
+      padding: 3px 0;
+      border: none;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+    }
+    tbody td::before {
+      content: attr(data-label);
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      min-width: 64px;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+    tbody td.td-hide { display: none; }
+    .td-company { font-size: 14px !important; font-weight: 800 !important; }
+    .td-amount { font-size: 14px !important; color: var(--accent) !important; }
+
+    /* 모달 */
+    .modal { padding: 20px 16px; border-radius: 12px 12px 0 0; max-height: 92vh; }
+    .modal-overlay { align-items: flex-end; }
+    .modal-title { font-size: 18px; }
+    .modal-grid { grid-template-columns: 1fr; gap: 10px; }
+    .status-badges { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 400px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .kpi-count { font-size: 24px; }
+    .status-badges { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -1040,16 +1125,16 @@ function renderTable() {
     const periodTag = r._period ? (r._period === 'short' ? '<span class="tag tag-short">단기</span>' : '<span class="tag tag-long">장기</span>') : '';
 
     html += `<tr onclick="openModal(${idx})">
-      <td class="td-date">${dateStr}</td>
-      <td style="white-space:nowrap">${bizTag} ${periodTag}</td>
-      <td><div class="td-company">${r['거래처명']||''}</div></td>
-      <td class="td-product">${r['품목명(요약)']||r['견적명']||''}</td>
-      <td>${inflowBadge}</td>
-      <td class="td-amount">${fmtAmt(+r['금액합계(VAT포함)']||0)}</td>
-      <td class="td-writer">${getWriter(r)}</td>
-      <td>${contactBadge}</td>
-      <td>${deadlineBadge}</td>
-      <td>${statusTag}</td>
+      <td class="td-date td-hide" data-label="일자">${dateStr}</td>
+      <td data-label="구분" style="white-space:nowrap">${bizTag} ${periodTag}</td>
+      <td data-label="거래처"><div class="td-company">${r['거래처명']||''}</div></td>
+      <td class="td-product" data-label="품목">${r['품목명(요약)']||r['견적명']||''}</td>
+      <td data-label="유입">${inflowBadge}</td>
+      <td class="td-amount" data-label="금액">${fmtAmt(+r['금액합계(VAT포함)']||0)}</td>
+      <td class="td-writer" data-label="담당자">${getWriter(r)}</td>
+      <td data-label="연락">${contactBadge}</td>
+      <td data-label="수주예상">${deadlineBadge}</td>
+      <td data-label="상태">${statusTag}</td>
     </tr>`;
   });
   html += '</tbody></table>';
