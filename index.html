@@ -1045,9 +1045,18 @@ function setTheme(t) {
 }
 
 // ── Date helpers ──
+function setMonthRange(d) {
+  const y = d.getFullYear(), m = d.getMonth();
+  const rs = document.getElementById('rangeStart');
+  const re = document.getElementById('rangeEnd');
+  if(rs) rs.value = fmt(new Date(y, m, 1));
+  if(re) re.value = fmt(new Date(y, m+1, 0));
+}
+
 function setToday() {
-  baseDate=new Date();
-  document.getElementById('baseDate').value=fmt(baseDate);
+  baseDate = new Date();
+  document.getElementById('baseDate').value = fmt(baseDate);
+  setMonthRange(baseDate);
   applyFilters();
 }
 function fmt(d) { return d.toISOString().slice(0,10); }
@@ -1241,10 +1250,7 @@ function applyFilters() {
 }
 
 function clearRange(){
-  const rs=document.getElementById('rangeStart');
-  const re=document.getElementById('rangeEnd');
-  if(rs) rs.value='';
-  if(re) re.value='';
+  setMonthRange(baseDate); // 기준일 해당 월로 리셋
   applyFilters();
 }
 
