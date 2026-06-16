@@ -1457,7 +1457,7 @@ function openModal(idx){openModalContent(filtered[idx]);}
 function openModalContent(r){
   if(!r) return;
   const dd=parseDate(r['수주예상일']||''); const df=dd?Math.floor((dd-baseDate)/86400000):null;
-  const lm=parseLastMod(r['최종수정일시']||''); const cd=daysDiff(lm);
+  const lm=getLastContactDate(r); const cd=daysDiff(lm);
   const ddS=r['수주예상일']||'';
   let ddT='–';
   if(r._status==='success') ddT='✓ 수주 완료';
