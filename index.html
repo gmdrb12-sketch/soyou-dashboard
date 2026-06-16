@@ -584,12 +584,10 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
       </div>
     </div>
 
-    <!-- 2. 견적 내역 -->
+    <!-- 2. 필터 -->
     <div class="report-section">
-      <div class="section-label">견적 전체 내역</div>
-
-      <!-- 필터 -->
-      <div class="filter-row" style="margin-bottom:14px">
+      <div class="section-label">필터</div>
+      <div class="filter-row">
         <div class="f-grp">
           <span class="f-lbl">사업자</span>
           <button class="fb on cr" data-filter="biz" data-val="all" onclick="setFilter('biz','all',this)">전체</button>
@@ -622,19 +620,6 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
           <select class="f-sel" id="inflowFilter" onchange="applyFilters()"><option value="all">전체</option></select>
         </div>
       </div>
-
-      <div class="tbl-header">
-        <div class="tbl-ttl-wrap">
-          <span class="tbl-ttl">견적 내역</span>
-          <span class="tbl-cnt" id="tableCount"></span>
-        </div>
-        <div class="srch-wrap">
-          <span class="srch-ico">🔍</span>
-          <input class="srch" type="text" placeholder="거래처, 품목 검색..." id="searchInput" oninput="applyFilters()">
-        </div>
-      </div>
-
-      <div id="tableBody"></div>
     </div>
 
     <!-- 3. 긴급 알림 -->
@@ -672,6 +657,22 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
     <div class="report-section">
       <div class="section-label">설비 유형별 현황</div>
       <div id="equipChart"></div>
+    </div>
+
+    <!-- 6. 견적 전체 내역 -->
+    <div class="report-section">
+      <div class="section-label">견적 전체 내역</div>
+      <div class="tbl-header">
+        <div class="tbl-ttl-wrap">
+          <span class="tbl-ttl">견적 내역</span>
+          <span class="tbl-cnt" id="tableCount"></span>
+        </div>
+        <div class="srch-wrap">
+          <span class="srch-ico">🔍</span>
+          <input class="srch" type="text" placeholder="거래처, 품목 검색..." id="searchInput" oninput="applyFilters()">
+        </div>
+      </div>
+      <div id="tableBody"></div>
     </div>
 
   </div>
