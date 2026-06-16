@@ -1080,6 +1080,15 @@ function parseLastMod(str) {
   if (m2) return new Date(2000 + +m2[1], +m2[2]-1, +m2[3]);
   return null;
 }
+function getLastContactDate(r) {
+  const text = r['견적결과(보고)']||'';
+  const year = baseDate.getFullYear();
+  const matches = text.match(/(\d{1,2})\.(\d{1,2})/g);
+  if(!matches||!matches.length) return parseLastMod(r['최종수정일시']||'');
+  const dates = matches.map(m=>{const[mo,da]=m.split('.');return new Date(year,+mo-1,+da);}).filter(d=>d<=baseDate);
+  if(!dates.length) return parseLastMod(r['최종수정일시']||'');
+  return new Date(Math.max(...dates));
+}
 function daysDiff(d) { return d ? Math.floor((baseDate-d)/86400000) : null; }
 function fmtAmt(n) {
   n=+n||0;
