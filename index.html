@@ -765,10 +765,14 @@ function formatDate(d) {
 }
 function parseDate(str) {
   if (!str) return null;
-  const s = str.trim().replace(/\./g,'/');
-  const m = s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-  if (!m) return null;
-  return new Date(+m[1], +m[2]-1, +m[3]);
+  const s = str.trim().replace(/\./g,'/').replace(/-/g,'/');
+  // 26/06/30 형식 (2자리 연도, 구글시트 gviz 출력)
+  const m2 = s.match(/^(\d{2})\/(\d{1,2})\/(\d{1,2})$/);
+  if (m2) return new Date(2000 + +m2[1], +m2[2]-1, +m2[3]);
+  // 2026/06/30 형식 (4자리 연도)
+  const m4 = s.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+  if (m4) return new Date(+m4[1], +m4[2]-1, +m4[3]);
+  return null;
 }
 function daysDiff(d) {
   if (!d) return null;
