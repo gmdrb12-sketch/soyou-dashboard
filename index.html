@@ -465,6 +465,40 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
 
+
+/* ── UPDATE TIMESTAMP ── */
+.update-wrap {
+  display: flex; align-items: center; gap: 8px;
+}
+.update-label {
+  font-size: 11px; color: var(--muted);
+  font-weight: 600; white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.update-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--border2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+  width: 200px;
+  padding: 2px 4px;
+  transition: border-color 0.15s;
+  letter-spacing: 0.3px;
+}
+.update-input:focus {
+  border-bottom-color: var(--red);
+}
+.update-input::placeholder {
+  color: var(--muted);
+  font-weight: 400;
+}
+@media (max-width: 768px) {
+  .update-wrap { display: none; }
+}
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
@@ -597,6 +631,17 @@ table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
     <div class="logo-name"><span class="so">So</span>YU T&amp;E</div>
     <div class="hdr-divider"></div>
     <div class="hdr-subtitle">영업현황 보고서</div>
+    <div class="hdr-divider"></div>
+    <div class="update-wrap">
+      <span class="update-label">업데이트</span>
+      <input
+        class="update-input"
+        type="text"
+        id="updateTimestamp"
+        placeholder="년도 월 일 시간 입력"
+        maxlength="30"
+      >
+    </div>
   </div>
   <div class="hdr-right">
     <div class="theme-toggle">
@@ -1200,6 +1245,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTheme(saved);
   document.getElementById('baseDate').value=fmt(new Date());
   document.getElementById('baseDate').addEventListener('change',applyFilters);
+
+  // 업데이트 일자 불러오기/저장
+  const tsEl = document.getElementById('updateTimestamp');
+  const savedTs = localStorage.getItem('soyuUpdateTs')||'';
+  if (savedTs) tsEl.value = savedTs;
+  tsEl.addEventListener('input', () => {
+    localStorage.setItem('soyuUpdateTs', tsEl.value);
+  });
+
   loadAll();
 });
 </script>
