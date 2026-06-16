@@ -1,25 +1,27 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>SoYU T&E 영업 대시보드</title>
+<title>SoYU T&E 영업현황</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
 
-:root {
-  --bg: #0b0c13;
-  --surface: #12141e;
-  --surface2: #191c28;
-  --surface3: #1f2233;
+/* ── THEME TOKENS ── */
+[data-theme="dark"] {
+  --bg: #0d0f18;
+  --bg2: #111320;
+  --surface: #161927;
+  --surface2: #1c1f30;
+  --surface3: #222538;
   --border: #252840;
   --border2: #2e3250;
   --text: #eceef5;
   --text2: #9ba3c0;
-  --muted: #555e7a;
+  --muted: #52597a;
+  --divider: #1e2135;
   --red: #e8192c;
   --red-dim: rgba(232,25,44,0.1);
-  --red-bright: #ff3347;
   --green: #22c55e;
   --green-dim: rgba(34,197,94,0.1);
   --yellow: #f59e0b;
@@ -29,8 +31,35 @@
   --blue: #3b82f6;
   --blue-dim: rgba(59,130,246,0.1);
   --purple: #8b5cf6;
-  --r: 10px;
-  --r-sm: 6px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+[data-theme="light"] {
+  --bg: #f0f2f7;
+  --bg2: #e8eaf0;
+  --surface: #ffffff;
+  --surface2: #f5f6fa;
+  --surface3: #eef0f6;
+  --border: #e2e5ef;
+  --border2: #d0d4e4;
+  --text: #1a1d2e;
+  --text2: #4a5070;
+  --muted: #8890aa;
+  --divider: #e8eaf2;
+  --red: #d41425;
+  --red-dim: rgba(212,20,37,0.08);
+  --green: #16a34a;
+  --green-dim: rgba(22,163,74,0.08);
+  --yellow: #d97706;
+  --yellow-dim: rgba(217,119,6,0.08);
+  --orange: #ea6c0a;
+  --orange-dim: rgba(234,108,10,0.08);
+  --blue: #2563eb;
+  --blue-dim: rgba(37,99,235,0.08);
+  --purple: #7c3aed;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -41,430 +70,427 @@ body {
   color: var(--text);
   min-height: 100vh;
   font-size: 13px;
+  transition: background 0.25s, color 0.25s;
 }
 
 /* ── HEADER ── */
 .hdr {
-  position: sticky; top:0; z-index:200;
+  position: sticky; top: 0; z-index: 300;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   height: 54px;
   display: flex; align-items: center;
-  padding: 0 20px;
-  gap: 12px;
+  padding: 0 24px;
   justify-content: space-between;
+  box-shadow: var(--shadow);
 }
-.hdr-logo { display:flex; align-items:center; gap:10px; }
-.logo-mark {
-  background: var(--red); color:#fff;
-  font-size:12px; font-weight:900;
-  padding: 4px 8px; border-radius:5px;
-  letter-spacing:0.5px;
-}
-.logo-name { font-size:15px; font-weight:700; letter-spacing:-0.3px; }
-.logo-name .so { color:var(--red); }
-.logo-pipe { width:1px; height:18px; background:var(--border2); }
-.logo-sub { font-size:11px; color:var(--muted); font-weight:500; }
 
-.hdr-right { display:flex; align-items:center; gap:8px; }
-.date-pill {
-  display:flex; align-items:center; gap:6px;
-  background:var(--surface2); border:1px solid var(--border2);
-  border-radius:20px; padding:5px 12px;
-  font-size:12px;
+.hdr-left { display: flex; align-items: center; gap: 14px; }
+.logo-badge {
+  background: var(--red); color: #fff;
+  font-size: 11px; font-weight: 900;
+  padding: 4px 9px; border-radius: 5px;
+  letter-spacing: 0.5px;
 }
-.date-pill label { color:var(--muted); font-size:11px; font-weight:600; }
+.logo-name { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+.logo-name .so { color: var(--red); }
+.hdr-divider { width: 1px; height: 18px; background: var(--border2); }
+.hdr-subtitle { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+
+.theme-toggle {
+  display: flex; align-items: center;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+}
+.theme-btn {
+  background: transparent; border: none;
+  border-radius: 16px; padding: 4px 10px;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  color: var(--muted); transition: all 0.2s;
+}
+.theme-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+[data-theme="light"] .theme-btn.active { box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+.date-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 5px 12px; font-size: 12px;
+}
+.date-pill label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; }
 .date-pill input[type=date] {
-  background:transparent; border:none; color:var(--text);
-  font-family:inherit; font-size:12px; outline:none; cursor:pointer;
-  width:100px;
+  background: transparent; border: none; color: var(--text);
+  font-family: inherit; font-size: 12px; outline: none; cursor: pointer; width: 100px;
 }
 .btn-today {
-  background:var(--red); color:#fff; border:none;
-  border-radius:20px; padding:5px 12px;
-  font-size:11px; font-weight:700; cursor:pointer;
-  font-family:inherit; white-space:nowrap;
+  background: var(--red); color: #fff; border: none;
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  font-family: inherit;
 }
 
-/* ── LAYOUT ── */
-.wrap { padding:16px 20px; max-width:1600px; margin:0 auto; }
+/* ── WRAP ── */
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0; }
 
-/* ── URGENT BANNER ── */
-.urgent-section { margin-bottom:14px; }
-.urgent-title {
-  font-size:11px; font-weight:700; color:var(--muted);
-  letter-spacing:0.5px; text-transform:uppercase;
-  margin-bottom:8px; display:flex; align-items:center; gap:6px;
+/* ── REPORT SECTIONS ── */
+.report-section {
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider);
+  padding: 20px 28px;
 }
-.urgent-title::before { content:''; width:3px; height:12px; background:var(--red); border-radius:2px; display:block; }
-.urgent-count {
-  background:var(--red); color:#fff;
-  font-size:10px; font-weight:800;
-  padding:1px 6px; border-radius:20px;
-}
-.urgent-cards { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch; }
-.urgent-cards::-webkit-scrollbar { display:none; }
-.urgent-card {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:12px 14px;
-  min-width:200px;
-  flex-shrink:0;
-  cursor:pointer;
-  transition:border-color 0.15s;
-  position:relative;
-  overflow:hidden;
-}
-.urgent-card::before {
-  content:''; position:absolute;
-  top:0; left:0; right:0; height:2px;
-}
-.urgent-card.type-overdue::before { background:var(--red); }
-.urgent-card.type-no-contact::before { background:var(--yellow); }
-.urgent-card.type-soon::before { background:var(--orange); }
-.urgent-card:hover { border-color:var(--border2); }
-.urgent-card-type { font-size:10px; font-weight:700; letter-spacing:0.3px; margin-bottom:5px; }
-.urgent-card.type-overdue .urgent-card-type { color:var(--red); }
-.urgent-card.type-no-contact .urgent-card-type { color:var(--yellow); }
-.urgent-card.type-soon .urgent-card-type { color:var(--orange); }
-.urgent-card-company { font-size:13px; font-weight:700; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.urgent-card-sub { font-size:11px; color:var(--text2); display:flex; justify-content:space-between; align-items:center; gap:8px; }
-.urgent-card-amt { font-size:12px; font-weight:700; color:var(--text); }
-.urgent-empty { font-size:12px; color:var(--muted); padding:12px 0; }
+.report-section:last-child { border-bottom: none; }
 
-/* ── KPI ── */
+.section-label {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.8px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── KPI ROW ── */
 .kpi-row {
-  display:grid;
-  grid-template-columns: repeat(4,1fr);
-  gap:10px;
-  margin-bottom:14px;
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden;
 }
-.kpi {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:16px;
-  position:relative; overflow:hidden;
+.kpi-cell {
+  background: var(--surface2);
+  padding: 16px 20px;
+  position: relative;
 }
-.kpi::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; }
-.kpi.k-total::after { background:var(--red); }
-.kpi.k-success::after { background:var(--green); }
-.kpi.k-pending::after { background:var(--yellow); }
-.kpi.k-fail::after { background:rgba(100,110,140,0.6); }
-
-.kpi-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.kpi-lbl { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0.4px; text-transform:uppercase; }
-.kpi-badge { font-size:11px; font-weight:800; padding:2px 8px; border-radius:20px; }
-.kpi.k-total .kpi-badge { background:var(--red-dim); color:var(--red); }
-.kpi.k-success .kpi-badge { background:var(--green-dim); color:var(--green); }
-.kpi.k-pending .kpi-badge { background:var(--yellow-dim); color:var(--yellow); }
-.kpi.k-fail .kpi-badge { background:rgba(100,110,140,0.1); color:var(--text2); }
-
-.kpi-num { font-size:38px; font-weight:800; letter-spacing:-2px; line-height:1; margin-bottom:4px; }
-.kpi.k-total .kpi-num { color:var(--red); }
-.kpi.k-success .kpi-num { color:var(--green); }
-.kpi.k-pending .kpi-num { color:var(--yellow); }
-.kpi.k-fail .kpi-num { color:var(--text2); }
-.kpi-amt { font-size:12px; color:var(--muted); }
-.kpi-amt strong { color:var(--text2); font-weight:600; }
-
-/* ── MID ROW ── */
-.mid-row {
-  display:grid;
-  grid-template-columns: 1fr 1fr 1.2fr;
-  gap:10px;
-  margin-bottom:14px;
+.kpi-cell::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
 }
-.card {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:16px;
+.kpi-cell.k-all::after { background: var(--red); }
+.kpi-cell.k-s::after { background: var(--green); }
+.kpi-cell.k-p::after { background: var(--yellow); }
+.kpi-cell.k-f::after { background: var(--muted); }
+
+.kpi-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.kpi-lbl { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+.kpi-pct { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 10px; }
+.k-all .kpi-pct { background: var(--red-dim); color: var(--red); }
+.k-s .kpi-pct { background: var(--green-dim); color: var(--green); }
+.k-p .kpi-pct { background: var(--yellow-dim); color: var(--yellow); }
+.k-f .kpi-pct { background: rgba(82,89,122,0.12); color: var(--muted); }
+
+.kpi-num { font-size: 40px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+.k-all .kpi-num { color: var(--red); }
+.k-s .kpi-num { color: var(--green); }
+.k-p .kpi-num { color: var(--yellow); }
+.k-f .kpi-num { color: var(--muted); }
+.kpi-unit { font-size: 14px; font-weight: 600; letter-spacing: 0; margin-left: 2px; }
+.kpi-amt { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.kpi-amt strong { color: var(--text2); font-weight: 600; }
+
+/* ── URGENT ── */
+.urgent-list { display: flex; flex-direction: column; gap: 8px; }
+.urgent-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
 }
-.card-title {
-  font-size:11px; font-weight:700; color:var(--muted);
-  letter-spacing:0.5px; text-transform:uppercase;
-  margin-bottom:12px; display:flex; align-items:center; gap:6px;
+.urgent-item:hover { background: var(--surface3); }
+.urgent-item.u-over { border-left-color: var(--red); }
+.urgent-item.u-nocon { border-left-color: var(--yellow); }
+.urgent-item.u-soon { border-left-color: var(--orange); }
+
+.u-badge {
+  font-size: 10px; font-weight: 800; padding: 3px 8px;
+  border-radius: 4px; white-space: nowrap; flex-shrink: 0;
 }
-.card-title::before { content:''; width:3px; height:11px; background:var(--red); border-radius:2px; display:block; }
+.u-over .u-badge { background: var(--red-dim); color: var(--red); }
+.u-nocon .u-badge { background: var(--yellow-dim); color: var(--yellow); }
+.u-soon .u-badge { background: var(--orange-dim); color: var(--orange); }
 
-/* 담당자 성과 */
-.writer-item { margin-bottom:10px; }
-.writer-head { display:flex; justify-content:space-between; margin-bottom:4px; align-items:center; }
-.writer-name { font-size:12px; font-weight:700; }
-.writer-stats { display:flex; gap:6px; font-size:11px; }
-.writer-stat-s { color:var(--green); font-weight:700; }
-.writer-stat-p { color:var(--yellow); }
-.writer-stat-f { color:var(--muted); }
-.writer-bar-track { background:var(--surface2); border-radius:3px; height:5px; display:flex; overflow:hidden; gap:1px; }
-.writer-bar-s { background:var(--green); height:100%; transition:width 0.5s ease; border-radius:2px; }
-.writer-bar-p { background:var(--yellow); height:100%; transition:width 0.5s ease; }
-.writer-bar-f { background:var(--border2); height:100%; transition:width 0.5s ease; border-radius:2px; }
+.u-co { font-size: 13px; font-weight: 700; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.u-writer { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.u-amt { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.u-dday { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.urgent-none { font-size: 13px; color: var(--muted); padding: 8px 0; display: flex; align-items: center; gap: 6px; }
 
-/* 유입경로 성공률 */
-.inflow-item { margin-bottom:9px; }
-.inflow-head { display:flex; justify-content:space-between; margin-bottom:3px; }
-.inflow-name { font-size:12px; color:var(--text2); }
-.inflow-rate { font-size:11px; font-weight:700; }
-.inflow-track { background:var(--surface2); border-radius:3px; height:5px; overflow:hidden; }
-.inflow-fill { height:100%; border-radius:3px; transition:width 0.5s ease; }
-
-/* 설비 차트 */
-.equip-item { margin-bottom:9px; }
-.equip-head { display:flex; justify-content:space-between; margin-bottom:3px; }
-.equip-name { font-size:12px; color:var(--text2); }
-.equip-val { font-size:11px; color:var(--muted); }
-.equip-track { background:var(--surface2); border-radius:3px; height:5px; overflow:hidden; }
-.equip-fill { height:100%; border-radius:3px; background:var(--red); transition:width 0.5s ease; }
+/* ── WRITER TABLE ── */
+.writer-table { width: 100%; border-collapse: collapse; }
+.writer-table th {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 6px 12px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.writer-table td { padding: 10px 12px; border-bottom: 1px solid var(--divider); font-size: 13px; }
+.writer-table tr:last-child td { border-bottom: none; }
+.writer-table tr:hover td { background: var(--surface2); }
+.wt-name { font-weight: 700; }
+.wt-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; gap: 1px; min-width: 80px; }
+.wt-s { background: var(--green); border-radius: 2px; }
+.wt-p { background: var(--yellow); }
+.wt-f { background: var(--border2); border-radius: 2px; }
+.wt-stat { font-size: 11px; }
+.wt-s-val { color: var(--green); font-weight: 700; }
+.wt-p-val { color: var(--yellow); }
+.wt-f-val { color: var(--muted); }
+.wt-amt { font-weight: 600; font-size: 12px; color: var(--text2); }
 
 /* ── FILTERS ── */
-.filter-wrap {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:10px 14px;
-  margin-bottom:10px;
-  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+.filter-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
-.f-lbl { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; white-space:nowrap; }
-.f-div { width:1px; height:18px; background:var(--border2); margin:0 2px; flex-shrink:0; }
-.f-group { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
+.f-grp { display: flex; align-items: center; gap: 5px; }
+.f-lbl { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; }
+.f-sep { width: 1px; height: 16px; background: var(--border2); margin: 0 2px; flex-shrink: 0; }
 .fb {
-  background:transparent; border:1px solid var(--border2);
-  color:var(--text2); border-radius:20px;
-  padding:3px 10px; font-size:11px; font-weight:500;
-  cursor:pointer; font-family:inherit; transition:all 0.12s;
-  white-space:nowrap;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text2); border-radius: 20px;
+  padding: 3px 10px; font-size: 11px; font-weight: 500;
+  cursor: pointer; font-family: inherit; transition: all 0.12s;
+  white-space: nowrap;
 }
-.fb:hover { border-color:var(--text2); color:var(--text); }
-.fb.on { background:var(--surface3); font-weight:700; }
-.fb.on.c-red { border-color:var(--red); color:var(--red); }
-.fb.on.c-green { border-color:var(--green); color:var(--green); }
-.fb.on.c-yellow { border-color:var(--yellow); color:var(--yellow); }
-.fb.on.c-gray { border-color:var(--text2); color:var(--text2); }
-.fb.on.c-blue { border-color:var(--blue); color:var(--blue); }
+.fb:hover { border-color: var(--text2); color: var(--text); }
+.fb.on { background: var(--surface3); font-weight: 700; }
+.fb.on.cr { border-color: var(--red); color: var(--red); }
+.fb.on.cg { border-color: var(--green); color: var(--green); }
+.fb.on.cy { border-color: var(--yellow); color: var(--yellow); }
 .f-sel {
-  background:var(--surface2); border:1px solid var(--border2);
-  color:var(--text); border-radius:var(--r-sm);
-  padding:3px 8px; font-size:11px; cursor:pointer;
-  font-family:inherit; outline:none; height:26px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); border-radius: 6px;
+  padding: 3px 8px; font-size: 11px;
+  cursor: pointer; font-family: inherit; outline: none; height: 26px;
 }
 
-/* ── TABLE ── */
-.tbl-card {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  overflow:hidden;
+/* ── MAIN TABLE ── */
+.tbl-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 0; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
 }
-.tbl-hdr {
-  padding:12px 16px;
-  display:flex; justify-content:space-between; align-items:center;
-  border-bottom:1px solid var(--border);
-  gap:10px;
-}
-.tbl-hdr-l { display:flex; align-items:center; gap:8px; }
-.tbl-ttl { font-size:13px; font-weight:700; }
+.tbl-ttl-wrap { display: flex; align-items: center; gap: 8px; }
+.tbl-ttl { font-size: 13px; font-weight: 700; }
 .tbl-cnt {
-  font-size:11px; color:var(--muted);
-  background:var(--surface2); border:1px solid var(--border2);
-  border-radius:20px; padding:2px 8px;
+  font-size: 11px; color: var(--muted);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2px 8px;
 }
-.srch-wrap { position:relative; }
-.srch-ico { position:absolute; left:9px; top:50%; transform:translateY(-50%); font-size:12px; pointer-events:none; }
+.srch-wrap { position: relative; }
+.srch-ico { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; pointer-events: none; }
 .srch {
-  background:var(--surface2); border:1px solid var(--border2);
-  color:var(--text); border-radius:var(--r-sm);
-  padding:5px 10px 5px 28px; font-size:12px;
-  font-family:inherit; outline:none; width:200px;
-  transition:border-color 0.15s;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); border-radius: 6px;
+  padding: 5px 10px 5px 28px; font-size: 12px;
+  font-family: inherit; outline: none; width: 200px;
+  transition: border-color 0.15s;
 }
-.srch:focus { border-color:var(--red); }
-.srch::placeholder { color:var(--muted); }
+.srch:focus { border-color: var(--red); }
+.srch::placeholder { color: var(--muted); }
 
-table { width:100%; border-collapse:collapse; }
-thead th {
-  padding:8px 12px; text-align:left;
-  color:var(--muted); font-size:10px; font-weight:700;
-  letter-spacing:0.5px; text-transform:uppercase;
-  background:var(--surface2); border-bottom:1px solid var(--border);
-  white-space:nowrap; position:sticky; top:54px; z-index:10;
-  cursor:pointer; user-select:none; transition:color 0.12s;
+table.main-tbl { width: 100%; border-collapse: collapse; margin-top: 12px; }
+table.main-tbl thead th {
+  padding: 8px 12px; text-align: left;
+  color: var(--muted); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+  transition: color 0.12s;
 }
-thead th:hover { color:var(--text2); }
-tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; }
-tbody tr:last-child { border-bottom:none; }
-tbody tr:hover { background:var(--surface2); }
-tbody td { padding:10px 12px; vertical-align:middle; }
+table.main-tbl thead th:hover { color: var(--text2); }
+table.main-tbl tbody tr {
+  border-bottom: 1px solid var(--divider);
+  cursor: pointer; transition: background 0.1s;
+}
+table.main-tbl tbody tr:last-child { border-bottom: none; }
+table.main-tbl tbody tr:hover { background: var(--surface2); }
+table.main-tbl tbody td { padding: 10px 12px; vertical-align: middle; }
 
-.td-co { font-weight:700; font-size:13px; }
-.td-prod { font-size:11px; color:var(--text2); max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.td-amt { font-weight:800; white-space:nowrap; font-size:13px; }
-.td-writer { font-size:12px; color:var(--text2); white-space:nowrap; }
-.td-date { font-size:11px; color:var(--muted); white-space:nowrap; }
+.td-co { font-weight: 700; font-size: 13px; }
+.td-sub { font-size: 10px; color: var(--muted); margin-top: 2px; display: flex; gap: 3px; }
+.td-prod { font-size: 11px; color: var(--text2); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.td-amt { font-weight: 800; font-size: 13px; white-space: nowrap; }
+.td-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.td-writer { font-size: 12px; color: var(--text2); white-space: nowrap; }
 
-/* tags */
-.tag { display:inline-block; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; white-space:nowrap; }
-.tag-corp { background:var(--blue-dim); color:var(--blue); }
-.tag-person { background:rgba(139,92,246,0.1); color:var(--purple); }
-.tag-short { background:var(--yellow-dim); color:var(--yellow); }
-.tag-long { background:var(--green-dim); color:var(--green); }
-.tag-success { background:var(--green-dim); color:var(--green); }
-.tag-ps { background:var(--yellow-dim); color:var(--yellow); }
-.tag-pl { background:var(--blue-dim); color:var(--blue); }
-.tag-fail { background:rgba(100,110,140,0.1); color:var(--text2); }
+/* TAGS */
+.tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.tag-corp { background: var(--blue-dim); color: var(--blue); }
+.tag-person { background: rgba(139,92,246,0.1); color: var(--purple); }
+.tag-short { background: var(--yellow-dim); color: var(--yellow); }
+.tag-long { background: var(--green-dim); color: var(--green); }
+.tag-success { background: var(--green-dim); color: var(--green); }
+.tag-ps { background: var(--yellow-dim); color: var(--yellow); }
+.tag-pl { background: var(--blue-dim); color: var(--blue); }
+.tag-fail { background: rgba(82,89,122,0.12); color: var(--muted); }
 
-/* contact / deadline badges */
-.cb { display:inline-flex; align-items:center; font-size:11px; padding:3px 7px; border-radius:var(--r-sm); font-weight:600; white-space:nowrap; }
-.cb-ok { background:var(--green-dim); color:var(--green); }
-.cb-warn { background:var(--yellow-dim); color:var(--yellow); }
-.cb-over { background:var(--red-dim); color:var(--red); }
-.cb-gray { background:var(--surface2); color:var(--muted); }
+/* BADGES */
+.cb { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 7px; border-radius: 5px; font-weight: 600; white-space: nowrap; }
+.cb-ok { background: var(--green-dim); color: var(--green); }
+.cb-warn { background: var(--yellow-dim); color: var(--yellow); }
+.cb-over { background: var(--red-dim); color: var(--red); }
+.cb-gray { background: var(--surface3); color: var(--muted); }
 
-.db { display:inline-flex; align-items:center; gap:3px; font-size:11px; padding:3px 7px; border-radius:var(--r-sm); font-weight:600; white-space:nowrap; flex-direction:column; align-items:flex-start; gap:1px; }
-.db-ok { background:var(--green-dim); color:var(--green); }
-.db-near { background:var(--yellow-dim); color:var(--yellow); }
-.db-over { background:var(--red-dim); color:var(--red); }
-.db-done { background:var(--green-dim); color:var(--green); }
-.db-fail { background:rgba(100,110,140,0.1); color:var(--muted); }
-.db-date { font-size:10px; opacity:0.7; font-weight:400; }
+.db { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; font-size: 11px; padding: 3px 7px; border-radius: 5px; font-weight: 600; white-space: nowrap; }
+.db-ok { background: var(--green-dim); color: var(--green); }
+.db-near { background: var(--yellow-dim); color: var(--yellow); }
+.db-over { background: var(--red-dim); color: var(--red); }
+.db-done { background: var(--green-dim); color: var(--green); }
+.db-fail { background: rgba(82,89,122,0.1); color: var(--muted); }
+.db-date { font-size: 10px; opacity: 0.65; font-weight: 400; }
 
-/* inflow */
-.ifl { display:inline-block; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:600; }
-.ifl-yt { background:rgba(255,70,70,0.1); color:#ff6b6b; }
-.ifl-da { background:var(--blue-dim); color:var(--blue); }
-.ifl-bl { background:rgba(139,92,246,0.1); color:var(--purple); }
-.ifl-sh { background:var(--green-dim); color:var(--green); }
-.ifl-ex { background:var(--yellow-dim); color:var(--yellow); }
-.ifl-et { background:var(--surface3); color:var(--text2); }
+.ifl { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.ifl-yt { background: rgba(255,70,70,0.1); color: #e05555; }
+.ifl-da { background: var(--blue-dim); color: var(--blue); }
+.ifl-bl { background: rgba(139,92,246,0.1); color: var(--purple); }
+.ifl-sh { background: var(--green-dim); color: var(--green); }
+.ifl-ex { background: var(--yellow-dim); color: var(--yellow); }
+.ifl-et { background: var(--surface3); color: var(--text2); }
 
 /* ── MODAL ── */
 .overlay {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.65); z-index:1000;
-  align-items:center; justify-content:center;
-  backdrop-filter:blur(8px);
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55); z-index: 1000;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
 }
-.overlay.on { display:flex; }
+.overlay.on { display: flex; }
 .modal {
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:14px;
-  width:640px; max-width:95vw; max-height:90vh;
-  overflow-y:auto; padding:26px 28px; position:relative;
-  box-shadow:0 32px 80px rgba(0,0,0,0.6);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 620px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; padding: 26px 28px; position: relative;
+  box-shadow: var(--shadow-lg);
 }
 .modal-x {
-  position:absolute; top:16px; right:16px;
-  background:var(--surface2); border:1px solid var(--border2);
-  color:var(--muted); width:28px; height:28px;
-  border-radius:50%; cursor:pointer; font-size:13px;
-  display:flex; align-items:center; justify-content:center;
-  transition:all 0.15s;
+  position: absolute; top: 16px; right: 16px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--muted); width: 28px; height: 28px;
+  border-radius: 50%; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
 }
-.modal-x:hover { color:var(--text); border-color:var(--text2); }
-.modal-tags { display:flex; gap:5px; margin-bottom:8px; flex-wrap:wrap; }
-.modal-co { font-size:22px; font-weight:800; margin-bottom:16px; letter-spacing:-0.5px; line-height:1.2; }
-.modal-stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+.modal-x:hover { color: var(--text); }
+.modal-tags { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+.modal-co { font-size: 21px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.4px; line-height: 1.2; }
+.modal-stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
 .modal-stat {
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:var(--r-sm); padding:10px 12px;
-  display:flex; align-items:center; gap:8px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px;
 }
-.modal-stat-ico { font-size:16px; }
-.modal-stat-lbl { font-size:10px; color:var(--muted); font-weight:700; letter-spacing:0.3px; text-transform:uppercase; margin-bottom:2px; }
-.modal-stat-val { font-size:13px; font-weight:700; }
-.modal-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-.modal-info-item label { font-size:10px; color:var(--muted); font-weight:700; letter-spacing:0.4px; text-transform:uppercase; display:block; margin-bottom:3px; }
-.modal-info-val { font-size:13px; font-weight:600; }
-.modal-info-val.big { color:var(--red); font-size:20px; font-weight:800; }
-.modal-product { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r-sm); padding:12px 14px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:14px; }
-.modal-prod-lbl { font-size:10px; color:var(--muted); font-weight:700; letter-spacing:0.4px; text-transform:uppercase; margin-bottom:6px; }
-.modal-hr { border:none; border-top:1px solid var(--border); margin:16px 0; }
-.hist-ttl { font-size:11px; color:var(--yellow); font-weight:700; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px; }
-.hist-entry { border-left:2px solid var(--border2); padding:8px 12px; margin-bottom:8px; border-radius:0 var(--r-sm) var(--r-sm) 0; transition:border-color 0.15s; }
-.hist-entry:hover { border-left-color:var(--red); }
-.hist-dt { font-size:11px; color:var(--red); font-weight:700; margin-bottom:3px; }
-.hist-txt { font-size:12px; color:var(--text2); line-height:1.65; white-space:pre-wrap; }
+.modal-stat-ico { font-size: 16px; }
+.ms-lbl { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 2px; }
+.ms-val { font-size: 13px; font-weight: 700; }
+.modal-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.mi label { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; display: block; margin-bottom: 3px; }
+.mi-val { font-size: 13px; font-weight: 600; }
+.mi-val.big { color: var(--red); font-size: 20px; font-weight: 800; }
+.modal-prod-lbl { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 6px; }
+.modal-prod { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+.modal-hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+.hist-ttl { font-size: 10px; color: var(--yellow); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+.hist-entry { border-left: 2px solid var(--border2); padding: 8px 12px; margin-bottom: 8px; border-radius: 0 6px 6px 0; transition: border-color 0.15s; }
+.hist-entry:hover { border-left-color: var(--red); }
+.hist-dt { font-size: 11px; color: var(--red); font-weight: 700; margin-bottom: 3px; }
+.hist-txt { font-size: 12px; color: var(--text2); line-height: 1.65; white-space: pre-wrap; }
 
-/* ── LOADING / EMPTY ── */
-.loading { text-align:center; padding:80px 20px; color:var(--muted); }
-.spinner { width:30px; height:30px; border:2px solid var(--border2); border-top-color:var(--red); border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto 12px; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.empty { text-align:center; padding:50px 20px; color:var(--muted); font-size:13px; }
+/* ── LOADING ── */
+.loading { text-align: center; padding: 80px 20px; color: var(--muted); }
+.spinner { width: 28px; height: 28px; border: 2px solid var(--border2); border-top-color: var(--red); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
 
-::-webkit-scrollbar { width:4px; height:4px; }
-::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* ── MOBILE ── */
-@media(max-width:768px) {
-  .hdr { padding:0 14px; height:50px; }
-  .logo-pipe, .logo-sub { display:none; }
-  .date-pill label { display:none; }
-  .date-pill input[type=date] { width:90px; }
-  .wrap { padding:12px 10px; }
+@media (max-width: 768px) {
+  .hdr { padding: 0 14px; height: 50px; }
+  .hdr-divider, .hdr-subtitle { display: none; }
+  .date-pill label { display: none; }
+  .date-pill input[type=date] { width: 88px; }
+  .wrap { padding: 0; }
+  .report-section { padding: 14px 14px; }
 
-  .kpi-row { grid-template-columns:1fr 1fr; gap:8px; }
-  .kpi-num { font-size:30px; }
-  .kpi { padding:12px; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .kpi-num { font-size: 30px; }
+  .kpi-cell { padding: 12px 14px; }
 
-  .urgent-card { min-width:170px; }
+  .urgent-item { flex-wrap: wrap; gap: 6px; }
+  .u-amt { margin-left: auto; }
 
-  .mid-row { grid-template-columns:1fr; gap:8px; }
+  .writer-table th, .writer-table td { padding: 8px 8px; }
+  .wt-bar { min-width: 50px; }
 
-  .filter-wrap { overflow-x:auto; flex-wrap:nowrap; padding:8px 12px; gap:6px; }
-  .f-group { flex-wrap:nowrap; }
+  .filter-row { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .f-grp { flex-shrink: 0; flex-wrap: nowrap; }
 
-  /* 테이블 → 카드 */
-  .tbl-hdr { padding:10px 12px; }
-  .srch { width:150px; }
-  table, thead, tbody, th, td, tr { display:block; }
-  thead { display:none; }
-  tbody tr {
-    border:1px solid var(--border);
-    border-radius:var(--r);
-    margin:7px 8px;
-    padding:12px;
-    background:var(--surface2);
+  .tbl-header { flex-wrap: wrap; gap: 8px; }
+  .srch { width: 150px; }
+
+  table.main-tbl, table.main-tbl thead, table.main-tbl tbody,
+  table.main-tbl th, table.main-tbl td, table.main-tbl tr { display: block; }
+  table.main-tbl thead { display: none; }
+  table.main-tbl tbody tr {
+    border: 1px solid var(--border); border-radius: 8px;
+    margin: 7px 0; padding: 12px; background: var(--surface2);
   }
-  tbody td {
-    padding:3px 0; border:none;
-    display:flex; align-items:flex-start; gap:6px;
+  table.main-tbl tbody td {
+    padding: 3px 0; border: none;
+    display: flex; align-items: flex-start; gap: 6px;
   }
-  tbody td::before {
-    content:attr(data-label);
-    font-size:10px; color:var(--muted);
-    font-weight:700; letter-spacing:0.3px;
-    text-transform:uppercase;
-    min-width:56px; flex-shrink:0; padding-top:1px;
+  table.main-tbl tbody td::before {
+    content: attr(data-label);
+    font-size: 10px; color: var(--muted); font-weight: 700;
+    letter-spacing: 0.3px; text-transform: uppercase;
+    min-width: 52px; flex-shrink: 0; padding-top: 1px;
   }
-  .td-co { font-size:14px; }
-  .td-amt { color:var(--red); }
-  td.hide-m { display:none; }
+  table.main-tbl tbody td.hide-m { display: none; }
+  .td-co { font-size: 14px; }
+  .td-amt { color: var(--red); }
 
-  .modal { border-radius:14px 14px 0 0; max-height:92vh; padding:20px 16px; }
-  .overlay.on { align-items:flex-end; }
-  .modal-co { font-size:18px; }
-  .modal-stat-row { grid-template-columns:1fr 1fr; }
-  .modal-info-grid { grid-template-columns:1fr; }
+  .modal { border-radius: 14px 14px 0 0; max-height: 92vh; padding: 18px 16px; }
+  .overlay.on { align-items: flex-end; }
+  .modal-co { font-size: 17px; }
+  .modal-stat-row { grid-template-columns: 1fr 1fr; }
+  .modal-info { grid-template-columns: 1fr; }
 }
-@media(max-width:420px) {
-  .kpi-num { font-size:26px; }
-  .kpi-lbl { font-size:10px; }
+@media (max-width: 420px) {
+  .kpi-num { font-size: 26px; }
+  .theme-toggle { display: none; }
 }
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <div class="hdr-logo">
-    <div class="logo-mark">SoYU</div>
+  <div class="hdr-left">
+    <div class="logo-badge">SoYU</div>
     <div class="logo-name"><span class="so">So</span>YU T&amp;E</div>
-    <div class="logo-pipe"></div>
-    <div class="logo-sub">영업 대시보드</div>
+    <div class="hdr-divider"></div>
+    <div class="hdr-subtitle">영업현황 보고서</div>
   </div>
   <div class="hdr-right">
+    <div class="theme-toggle">
+      <button class="theme-btn active" id="btnDark" onclick="setTheme('dark')">🌙 다크</button>
+      <button class="theme-btn" id="btnLight" onclick="setTheme('light')">☀️ 라이트</button>
+    </div>
     <div class="date-pill">
       <label>기준일</label>
       <input type="date" id="baseDate">
@@ -474,115 +500,109 @@ tbody td { padding:10px 12px; vertical-align:middle; }
 </div>
 
 <div class="wrap">
-  <div id="loadingView" class="loading">
+  <div id="loadingView" class="loading" style="padding:80px 20px">
     <div class="spinner"></div>
     <div>데이터 불러오는 중...</div>
   </div>
 
   <div id="dashContent" style="display:none">
 
-    <!-- 긴급 알림 -->
-    <div class="urgent-section">
-      <div class="urgent-title">
-        🚨 지금 챙겨야 할 건
-        <span class="urgent-count" id="urgentCount">0</span>
-      </div>
-      <div class="urgent-cards" id="urgentCards">
-        <div class="urgent-empty">긴급 건 없음 ✅</div>
+    <!-- 1. 전체 현황 -->
+    <div class="report-section">
+      <div class="section-label">전체 현황</div>
+      <div class="kpi-row">
+        <div class="kpi-cell k-all">
+          <div class="kpi-top"><span class="kpi-lbl">전체 견적</span><span class="kpi-pct" id="kT-pct">전체</span></div>
+          <div class="kpi-num" id="kT-cnt">–<span class="kpi-unit">건</span></div>
+          <div class="kpi-amt">합계 <strong id="kT-amt">–</strong></div>
+        </div>
+        <div class="kpi-cell k-s">
+          <div class="kpi-top"><span class="kpi-lbl">수주 성공</span><span class="kpi-pct" id="kS-pct">–</span></div>
+          <div class="kpi-num" id="kS-cnt">–<span class="kpi-unit">건</span></div>
+          <div class="kpi-amt">합계 <strong id="kS-amt">–</strong></div>
+        </div>
+        <div class="kpi-cell k-p">
+          <div class="kpi-top"><span class="kpi-lbl">가망 (대기)</span><span class="kpi-pct" id="kP-pct">–</span></div>
+          <div class="kpi-num" id="kP-cnt">–<span class="kpi-unit">건</span></div>
+          <div class="kpi-amt">합계 <strong id="kP-amt">–</strong></div>
+        </div>
+        <div class="kpi-cell k-f">
+          <div class="kpi-top"><span class="kpi-lbl">수주 실패</span><span class="kpi-pct" id="kF-pct">–</span></div>
+          <div class="kpi-num" id="kF-cnt">–<span class="kpi-unit">건</span></div>
+          <div class="kpi-amt">합계 <strong id="kF-amt">–</strong></div>
+        </div>
       </div>
     </div>
 
-    <!-- KPI -->
-    <div class="kpi-row">
-      <div class="kpi k-total">
-        <div class="kpi-head">
-          <div class="kpi-lbl">전체 견적</div>
-          <div class="kpi-badge" id="kT-pct">–</div>
-        </div>
-        <div class="kpi-num" id="kT-cnt">–</div>
-        <div class="kpi-amt">합계 <strong id="kT-amt">–</strong></div>
+    <!-- 2. 긴급 알림 -->
+    <div class="report-section">
+      <div class="section-label">
+        지금 챙겨야 할 건
+        <span id="urgentCount" style="background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:10px;letter-spacing:0;text-transform:none">0</span>
       </div>
-      <div class="kpi k-success">
-        <div class="kpi-head">
-          <div class="kpi-lbl">수주 성공</div>
-          <div class="kpi-badge" id="kS-pct">–</div>
-        </div>
-        <div class="kpi-num" id="kS-cnt">–</div>
-        <div class="kpi-amt">합계 <strong id="kS-amt">–</strong></div>
-      </div>
-      <div class="kpi k-pending">
-        <div class="kpi-head">
-          <div class="kpi-lbl">가망 (대기)</div>
-          <div class="kpi-badge" id="kP-pct">–</div>
-        </div>
-        <div class="kpi-num" id="kP-cnt">–</div>
-        <div class="kpi-amt">합계 <strong id="kP-amt">–</strong></div>
-      </div>
-      <div class="kpi k-fail">
-        <div class="kpi-head">
-          <div class="kpi-lbl">수주 실패</div>
-          <div class="kpi-badge" id="kF-pct">–</div>
-        </div>
-        <div class="kpi-num" id="kF-cnt">–</div>
-        <div class="kpi-amt">합계 <strong id="kF-amt">–</strong></div>
-      </div>
+      <div id="urgentList"><div class="urgent-none">긴급 건 없음 ✅</div></div>
     </div>
 
-    <!-- 중간 분석 -->
-    <div class="mid-row">
-      <div class="card">
-        <div class="card-title">담당자별 현황</div>
-        <div id="writerChart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">유입경로 성공률</div>
-        <div id="inflowChart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">설비 유형별 금액</div>
-        <div id="equipChart"></div>
-      </div>
+    <!-- 3. 담당자 현황 -->
+    <div class="report-section">
+      <div class="section-label">담당자별 현황</div>
+      <table class="writer-table">
+        <thead><tr>
+          <th>담당자</th><th>전체</th>
+          <th>성공</th><th>가망</th><th>실패</th>
+          <th>현황</th><th>총 금액</th>
+        </tr></thead>
+        <tbody id="writerTbody"></tbody>
+      </table>
     </div>
 
-    <!-- 필터 -->
-    <div class="filter-wrap">
-      <div class="f-group">
-        <span class="f-lbl">사업자</span>
-        <button class="fb on c-red" data-filter="biz" data-val="all" onclick="setFilter('biz','all',this)">전체</button>
-        <button class="fb" data-filter="biz" data-val="corp" onclick="setFilter('biz','corp',this)">법인</button>
-        <button class="fb" data-filter="biz" data-val="person" onclick="setFilter('biz','person',this)">개인</button>
-      </div>
-      <div class="f-div"></div>
-      <div class="f-group">
-        <span class="f-lbl">기간</span>
-        <button class="fb on c-red" data-filter="period" data-val="all" onclick="setFilter('period','all',this)">전체</button>
-        <button class="fb" data-filter="period" data-val="short" onclick="setFilter('period','short',this)">단기</button>
-        <button class="fb" data-filter="period" data-val="long" onclick="setFilter('period','long',this)">장기</button>
-      </div>
-      <div class="f-div"></div>
-      <div class="f-group">
-        <span class="f-lbl">상태</span>
-        <button class="fb on c-red" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">전체</button>
-        <button class="fb" data-filter="status" data-val="success" onclick="setFilter('status','success',this)">성공</button>
-        <button class="fb" data-filter="status" data-val="pending" onclick="setFilter('status','pending',this)">가망</button>
-        <button class="fb" data-filter="status" data-val="fail" onclick="setFilter('status','fail',this)">실패</button>
-      </div>
-      <div class="f-div"></div>
-      <div class="f-group">
-        <span class="f-lbl">담당자</span>
-        <select class="f-sel" id="writerFilter" onchange="applyFilters()"><option value="all">전체</option></select>
-      </div>
-      <div class="f-div"></div>
-      <div class="f-group">
-        <span class="f-lbl">유입경로</span>
-        <select class="f-sel" id="inflowFilter" onchange="applyFilters()"><option value="all">전체</option></select>
-      </div>
+    <!-- 4. 설비 현황 -->
+    <div class="report-section">
+      <div class="section-label">설비 유형별 현황</div>
+      <div id="equipChart"></div>
     </div>
 
-    <!-- 테이블 -->
-    <div class="tbl-card">
-      <div class="tbl-hdr">
-        <div class="tbl-hdr-l">
+    <!-- 5. 견적 내역 -->
+    <div class="report-section">
+      <div class="section-label">견적 전체 내역</div>
+
+      <!-- 필터 -->
+      <div class="filter-row" style="margin-bottom:14px">
+        <div class="f-grp">
+          <span class="f-lbl">사업자</span>
+          <button class="fb on cr" data-filter="biz" data-val="all" onclick="setFilter('biz','all',this)">전체</button>
+          <button class="fb" data-filter="biz" data-val="corp" onclick="setFilter('biz','corp',this)">법인</button>
+          <button class="fb" data-filter="biz" data-val="person" onclick="setFilter('biz','person',this)">개인</button>
+        </div>
+        <div class="f-sep"></div>
+        <div class="f-grp">
+          <span class="f-lbl">기간</span>
+          <button class="fb on cr" data-filter="period" data-val="all" onclick="setFilter('period','all',this)">전체</button>
+          <button class="fb" data-filter="period" data-val="short" onclick="setFilter('period','short',this)">단기</button>
+          <button class="fb" data-filter="period" data-val="long" onclick="setFilter('period','long',this)">장기</button>
+        </div>
+        <div class="f-sep"></div>
+        <div class="f-grp">
+          <span class="f-lbl">상태</span>
+          <button class="fb on cr" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">전체</button>
+          <button class="fb" data-filter="status" data-val="success" onclick="setFilter('status','success',this)">성공</button>
+          <button class="fb" data-filter="status" data-val="pending" onclick="setFilter('status','pending',this)">가망</button>
+          <button class="fb" data-filter="status" data-val="fail" onclick="setFilter('status','fail',this)">실패</button>
+        </div>
+        <div class="f-sep"></div>
+        <div class="f-grp">
+          <span class="f-lbl">담당자</span>
+          <select class="f-sel" id="writerFilter" onchange="applyFilters()"><option value="all">전체</option></select>
+        </div>
+        <div class="f-sep"></div>
+        <div class="f-grp">
+          <span class="f-lbl">유입</span>
+          <select class="f-sel" id="inflowFilter" onchange="applyFilters()"><option value="all">전체</option></select>
+        </div>
+      </div>
+
+      <div class="tbl-header">
+        <div class="tbl-ttl-wrap">
           <span class="tbl-ttl">견적 내역</span>
           <span class="tbl-cnt" id="tableCount"></span>
         </div>
@@ -591,6 +611,7 @@ tbody td { padding:10px 12px; vertical-align:middle; }
           <input class="srch" type="text" placeholder="거래처, 품목 검색..." id="searchInput" oninput="applyFilters()">
         </div>
       </div>
+
       <div id="tableBody"></div>
     </div>
 
@@ -608,30 +629,37 @@ tbody td { padding:10px 12px; vertical-align:middle; }
 <script>
 const SHEET_ID = '18t4kHYrmyg793WWVmp7G2TCuiBnomZ_1eh_U7YRXLyQ';
 const TABS = {
-  '개인단기':   { biz:'person', period:'short', status:'pending' },
-  '개인장기':   { biz:'person', period:'long',  status:'pending' },
-  '법인단기':   { biz:'corp',   period:'short', status:'pending' },
-  '법인장기':   { biz:'corp',   period:'long',  status:'pending' },
-  '개인수주성공':{ biz:'person', period:null,   status:'success' },
-  '법인수주성공':{ biz:'corp',   period:null,   status:'success' },
-  '개인수주실패':{ biz:'person', period:null,   status:'fail' },
-  '법인수주실패':{ biz:'corp',   period:null,   status:'fail' },
+  '개인단기':    { biz:'person', period:'short', status:'pending' },
+  '개인장기':    { biz:'person', period:'long',  status:'pending' },
+  '법인단기':    { biz:'corp',   period:'short', status:'pending' },
+  '법인장기':    { biz:'corp',   period:'long',  status:'pending' },
+  '개인수주성공': { biz:'person', period:null, status:'success' },
+  '법인수주성공': { biz:'corp',   period:null, status:'success' },
+  '개인수주실패': { biz:'person', period:null, status:'fail' },
+  '법인수주실패': { biz:'corp',   period:null, status:'fail' },
 };
+const COLORS = ['#e8192c','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#f97316','#38bdf8'];
 
-const CHART_COLORS = ['#e8192c','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#f97316','#38bdf8','#4ade80'];
+let allData=[], filtered=[];
+let filters={ biz:'all', period:'all', status:'all' };
+let sortCol=null, sortDir=1;
+let baseDate=new Date();
 
-let allData = [], filtered = [];
-let filters = { biz:'all', period:'all', status:'all' };
-let sortCol = null, sortDir = 1;
-let baseDate = new Date();
+// ── Theme ──
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('btnDark').classList.toggle('active', t==='dark');
+  document.getElementById('btnLight').classList.toggle('active', t==='light');
+  localStorage.setItem('soyuTheme', t);
+}
 
 // ── Date helpers ──
 function setToday() {
-  baseDate = new Date();
-  document.getElementById('baseDate').value = formatDate(baseDate);
+  baseDate=new Date();
+  document.getElementById('baseDate').value=fmt(baseDate);
   applyFilters();
 }
-function formatDate(d) { return d.toISOString().slice(0,10); }
+function fmt(d) { return d.toISOString().slice(0,10); }
 
 function parseDate(str) {
   if (!str) return null;
@@ -642,13 +670,7 @@ function parseDate(str) {
   if (m4) return new Date(+m4[1], +m4[2]-1, +m4[3]);
   return null;
 }
-
-function daysDiff(d) {
-  if (!d) return null;
-  return Math.floor((baseDate - d) / 86400000);
-}
-
-function parseLastModDate(str) {
+function parseLastMod(str) {
   if (!str) return null;
   const m4 = str.match(/(\d{4})\/(\d{2})\/(\d{2})/);
   if (m4) return new Date(+m4[1], +m4[2]-1, +m4[3]);
@@ -656,390 +678,250 @@ function parseLastModDate(str) {
   if (m2) return new Date(2000 + +m2[1], +m2[2]-1, +m2[3]);
   return null;
 }
-
+function daysDiff(d) { return d ? Math.floor((baseDate-d)/86400000) : null; }
 function fmtAmt(n) {
-  if (!n) return '0원';
-  if (n >= 100000000) return (n/100000000).toFixed(1)+'억';
-  if (n >= 10000) return Math.round(n/10000)+'만원';
+  n=+n||0;
+  if (n>=100000000) return (n/100000000).toFixed(1)+'억';
+  if (n>=10000) return Math.round(n/10000)+'만원';
   return n.toLocaleString()+'원';
 }
-
-function getWriter(r) {
-  return (r['작성자']||r['마지막수정자']||'').replace(/ (대리|이사|주임|팀장|과장|사원|부장)/g,'').trim();
-}
-
-function extractProductType(r) {
-  const n = (r['품목명(요약)']||r['견적명']||'').toLowerCase();
-  if (n.includes('랩핑')) return '랩핑기';
-  if (n.includes('테핑')||n.includes('테이핑')) return '테이핑기';
-  if (n.includes('밴딩')||n.includes('밴드')) return '밴딩기/밴드';
-  if (n.includes('스트레치')||n.includes('필름')) return '스트레치필름';
-  if (n.includes('박스')) return '박스포장라인';
-  if (n.includes('코일')) return '코일랩핑기';
+function getWriter(r) { return (r['작성자']||r['마지막수정자']||'').replace(/ (대리|이사|주임|팀장|과장|사원|부장)/g,'').trim(); }
+function getProdType(r) {
+  const n=(r['품목명(요약)']||r['견적명']||'').toLowerCase();
+  if(n.includes('랩핑')) return '랩핑기';
+  if(n.includes('테핑')||n.includes('테이핑')) return '테이핑기';
+  if(n.includes('밴딩')||n.includes('밴드')) return '밴딩기/밴드';
+  if(n.includes('스트레치')||n.includes('필름')) return '스트레치필름';
+  if(n.includes('박스')) return '박스포장라인';
+  if(n.includes('코일')) return '코일랩핑기';
   return '기타';
 }
 
 // ── Fetch ──
-async function fetchTab(tabName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
-  try {
-    const r = await fetch(url);
-    if (!r.ok) return [];
-    return parseCSV(await r.text(), tabName);
-  } catch(e) { return []; }
+async function fetchTab(name) {
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+  try { const r=await fetch(url); if(!r.ok) return []; return parseCSV(await r.text(), name); }
+  catch(e) { return []; }
 }
 
 function parseCSV(text, tabName) {
-  const allLines = text.split('\n');
-  const lines = [];
-  let cur = '', inQ = false;
-  for (const l of allLines) {
-    for (const c of l) { if (c==='"') inQ=!inQ; }
-    cur += (cur?'\n':'')+l;
-    if (!inQ) { lines.push(cur); cur=''; }
-  }
-  if (cur) lines.push(cur);
-
-  const meta = TABS[tabName];
-  const o = (tabName==='개인단기') ? 1 : 0;
-  const rows = [];
-
-  for (const line of lines) {
-    const v = parseCSVLine(line);
-    if (!v||v.length<10) continue;
-    const dateNo = clean(v[0]);
-    const company = clean(v[2+o]);
-    if (!dateNo.match(/^\d{4}\/\d{2}\/\d{2}/)&&!dateNo.match(/^\d{2}-\d{2}-\d{2}/)) continue;
-    if (!company) continue;
-
-    rows.push({
-      '일자-No.':         dateNo,
-      '거래처명':          company,
-      '유입경로':          clean(v[3+o]),
-      '고객명':            clean(v[4+o]),
-      '고객연락처':        clean(v[5+o]),
-      '거래처담당자':      clean(v[6+o]),
-      '작성자':            clean(v[7+o]),
-      '견적명':            clean(v[8+o]),
-      '품목명(요약)':      clean(v[9+o]),
-      '금액합계(VAT포함)': clean(v[12+o]).replace(/[^0-9]/g,''),
-      '진행상태':          clean(v[13+o]),
-      '수주예상일':        clean(v[14+o]),
-      '지역':              clean(v[16+o]),
-      '견적결과(보고)':    clean(v[17+o]),
-      '최종수정일시':      clean(v[23+o]),
-      '마지막수정자':      clean(v[24+o]),
-      _biz: meta.biz, _period: meta.period,
-      _status: meta.status, _tab: tabName,
-    });
+  const raw=text.split('\n'); const lines=[]; let cur='',inQ=false;
+  for(const l of raw){ for(const c of l){if(c==='"')inQ=!inQ;} cur+=(cur?'\n':'')+l; if(!inQ){lines.push(cur);cur='';} }
+  if(cur) lines.push(cur);
+  const meta=TABS[tabName]; const o=(tabName==='개인단기')?1:0; const rows=[];
+  for(const line of lines){
+    const v=csvLine(line); if(!v||v.length<10) continue;
+    const d=cl(v[0]), co=cl(v[2+o]);
+    if(!d.match(/^\d{4}\/\d{2}\/\d{2}/)&&!d.match(/^\d{2}-\d{2}-\d{2}/)) continue;
+    if(!co) continue;
+    rows.push({'일자-No.':d,'거래처명':co,'유입경로':cl(v[3+o]),'고객명':cl(v[4+o]),'고객연락처':cl(v[5+o]),'거래처담당자':cl(v[6+o]),'작성자':cl(v[7+o]),'견적명':cl(v[8+o]),'품목명(요약)':cl(v[9+o]),'금액합계(VAT포함)':cl(v[12+o]).replace(/[^0-9]/g,''),'진행상태':cl(v[13+o]),'수주예상일':cl(v[14+o]),'지역':cl(v[16+o]),'견적결과(보고)':cl(v[17+o]),'최종수정일시':cl(v[23+o]),'마지막수정자':cl(v[24+o]),_biz:meta.biz,_period:meta.period,_status:meta.status,_tab:tabName});
   }
   return rows;
 }
-
-function clean(v) { return (v||'').trim().replace(/^"|"$/g,''); }
-
-function parseCSVLine(line) {
-  const result=[]; let cur='', inQ=false;
-  for (const c of line) {
-    if (c==='"') inQ=!inQ;
-    else if (c===','&&!inQ) { result.push(cur); cur=''; }
-    else cur+=c;
-  }
-  result.push(cur);
-  return result;
-}
+function cl(v){return(v||'').trim().replace(/^"|"$/g,'');}
+function csvLine(line){const r=[];let c='',q=false;for(const ch of line){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c);c='';}else c+=ch;}r.push(c);return r;}
 
 // ── Load ──
 async function loadAll() {
-  const results = await Promise.all(Object.keys(TABS).map(fetchTab));
-  allData = results.flat();
-
-  const writers = [...new Set(allData.map(r=>getWriter(r)).filter(Boolean))].sort();
-  const inflows = [...new Set(allData.map(r=>r['유입경로']||'').filter(Boolean))].sort();
-  const wSel = document.getElementById('writerFilter');
-  writers.forEach(w => { const o=document.createElement('option'); o.value=w; o.textContent=w; wSel.appendChild(o); });
-  const iSel = document.getElementById('inflowFilter');
-  inflows.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; iSel.appendChild(o); });
-
+  const res=await Promise.all(Object.keys(TABS).map(fetchTab));
+  allData=res.flat();
+  const ws=[...new Set(allData.map(r=>getWriter(r)).filter(Boolean))].sort();
+  const infs=[...new Set(allData.map(r=>r['유입경로']||'').filter(Boolean))].sort();
+  const wSel=document.getElementById('writerFilter');
+  ws.forEach(w=>{const o=document.createElement('option');o.value=w;o.textContent=w;wSel.appendChild(o);});
+  const iSel=document.getElementById('inflowFilter');
+  infs.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;iSel.appendChild(o);});
   document.getElementById('loadingView').style.display='none';
   document.getElementById('dashContent').style.display='block';
   applyFilters();
 }
 
-// ── Filters ──
-function setFilter(type, val, btn) {
-  filters[type] = val;
-  document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => {
-    b.classList.remove('on','c-red','c-green','c-yellow','c-gray','c-blue');
-  });
-  btn.classList.add('on','c-red');
+// ── Filter ──
+function setFilter(type,val,btn) {
+  filters[type]=val;
+  document.querySelectorAll(`[data-filter="${type}"]`).forEach(b=>b.classList.remove('on','cr','cg','cy'));
+  btn.classList.add('on','cr');
   applyFilters();
 }
 
 function applyFilters() {
-  const writer = document.getElementById('writerFilter').value;
-  const inflow = document.getElementById('inflowFilter').value;
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const bd = document.getElementById('baseDate').value;
-  if (bd) baseDate = new Date(bd);
+  const writer=document.getElementById('writerFilter').value;
+  const inflow=document.getElementById('inflowFilter').value;
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const bd=document.getElementById('baseDate').value;
+  if(bd) baseDate=new Date(bd);
 
-  filtered = allData.filter(r => {
-    if (filters.biz!=='all'&&r._biz!==filters.biz) return false;
-    if (filters.period!=='all'&&r._status==='pending'&&r._period!==filters.period) return false;
-    if (filters.status!=='all'&&r._status!==filters.status) return false;
-    if (writer!=='all'&&getWriter(r)!==writer) return false;
-    if (inflow!=='all'&&(r['유입경로']||'')!==inflow) return false;
-    if (search) {
-      const hay=((r['거래처명']||'')+(r['품목명(요약)']||'')+(r['견적명']||'')).toLowerCase();
-      if (!hay.includes(search)) return false;
-    }
+  filtered=allData.filter(r=>{
+    if(filters.biz!=='all'&&r._biz!==filters.biz) return false;
+    if(filters.period!=='all'&&r._status==='pending'&&r._period!==filters.period) return false;
+    if(filters.status!=='all'&&r._status!==filters.status) return false;
+    if(writer!=='all'&&getWriter(r)!==writer) return false;
+    if(inflow!=='all'&&(r['유입경로']||'')!==inflow) return false;
+    if(search){const h=((r['거래처명']||'')+(r['품목명(요약)']||'')+(r['견적명']||'')).toLowerCase();if(!h.includes(search))return false;}
     return true;
   });
 
-  renderUrgent();
-  renderKPI();
-  renderCharts();
-  renderTable();
-}
-
-// ── Urgent ──
-function renderUrgent() {
-  const pending = allData.filter(r=>r._status==='pending');
-  const urgent = [];
-
-  pending.forEach((r,idx) => {
-    const ddDate = parseDate(r['수주예상일']||'');
-    const ddDiff = ddDate ? Math.floor((ddDate-baseDate)/86400000) : null;
-    const lastMod = parseLastModDate(r['최종수정일시']||'');
-    const contactDays = daysDiff(lastMod);
-    const amt = +r['금액합계(VAT포함)']||0;
-
-    if (ddDiff!==null&&ddDiff<0) {
-      urgent.push({ type:'overdue', label:'수주예상일 초과', r, sub:`D+${Math.abs(ddDiff)} 초과`, amt });
-    } else if (contactDays!==null&&contactDays>=7) {
-      urgent.push({ type:'no-contact', label:`${contactDays}일째 미연락`, r, sub:'연락 필요', amt });
-    } else if (ddDiff!==null&&ddDiff<=3&&ddDiff>=0) {
-      urgent.push({ type:'soon', label:`D-${ddDiff} 임박`, r, sub:'수주예상일 임박', amt });
-    }
-  });
-
-  // sort by amount desc
-  urgent.sort((a,b)=>b.amt-a.amt);
-
-  document.getElementById('urgentCount').textContent = urgent.length;
-  const container = document.getElementById('urgentCards');
-
-  if (urgent.length===0) {
-    container.innerHTML='<div class="urgent-empty">긴급 건 없음 ✅</div>';
-    return;
-  }
-
-  container.innerHTML = urgent.map((u,i)=>`
-    <div class="urgent-card type-${u.type}" onclick="openModalByRow(${allData.indexOf(u.r)})">
-      <div class="urgent-card-type">${u.label}</div>
-      <div class="urgent-card-company">${u.r['거래처명']}</div>
-      <div class="urgent-card-sub">
-        <span>${u.sub}</span>
-        <span class="urgent-card-amt">${fmtAmt(u.amt)}</span>
-      </div>
-    </div>
-  `).join('');
+  renderKPI(); renderUrgent(); renderWriter(); renderEquip(); renderTable();
 }
 
 // ── KPI ──
-function renderKPI() {
-  const total = filtered.length;
-  const success = filtered.filter(r=>r._status==='success');
-  const pending = filtered.filter(r=>r._status==='pending');
-  const fail = filtered.filter(r=>r._status==='fail');
-  const sum = arr=>arr.reduce((s,r)=>s+(+r['금액합계(VAT포함)']||0),0);
-
-  document.getElementById('kT-cnt').textContent=total+'건';
+function renderKPI(){
+  const t=filtered.length,s=filtered.filter(r=>r._status==='success'),p=filtered.filter(r=>r._status==='pending'),f=filtered.filter(r=>r._status==='fail');
+  const sum=arr=>arr.reduce((a,r)=>a+(+r['금액합계(VAT포함)']||0),0);
+  const pct=n=>t?Math.round(n/t*100)+'%':'0%';
+  document.getElementById('kT-cnt').innerHTML=t+'<span class="kpi-unit">건</span>';
   document.getElementById('kT-amt').textContent=fmtAmt(sum(filtered));
   document.getElementById('kT-pct').textContent='전체';
-  document.getElementById('kS-cnt').textContent=success.length+'건';
-  document.getElementById('kS-amt').textContent=fmtAmt(sum(success));
-  document.getElementById('kS-pct').textContent=total?Math.round(success.length/total*100)+'%':'0%';
-  document.getElementById('kP-cnt').textContent=pending.length+'건';
-  document.getElementById('kP-amt').textContent=fmtAmt(sum(pending));
-  document.getElementById('kP-pct').textContent=total?Math.round(pending.length/total*100)+'%':'0%';
-  document.getElementById('kF-cnt').textContent=fail.length+'건';
-  document.getElementById('kF-amt').textContent=fmtAmt(sum(fail));
-  document.getElementById('kF-pct').textContent=total?Math.round(fail.length/total*100)+'%':'0%';
+  document.getElementById('kS-cnt').innerHTML=s.length+'<span class="kpi-unit">건</span>';
+  document.getElementById('kS-amt').textContent=fmtAmt(sum(s));
+  document.getElementById('kS-pct').textContent=pct(s.length);
+  document.getElementById('kP-cnt').innerHTML=p.length+'<span class="kpi-unit">건</span>';
+  document.getElementById('kP-amt').textContent=fmtAmt(sum(p));
+  document.getElementById('kP-pct').textContent=pct(p.length);
+  document.getElementById('kF-cnt').innerHTML=f.length+'<span class="kpi-unit">건</span>';
+  document.getElementById('kF-amt').textContent=fmtAmt(sum(f));
+  document.getElementById('kF-pct').textContent=pct(f.length);
 }
 
-// ── Charts ──
-function renderCharts() {
-  // 담당자별
-  const wMap = {};
+// ── Urgent ──
+function renderUrgent(){
+  const pending=allData.filter(r=>r._status==='pending');
+  const items=[];
+  pending.forEach(r=>{
+    const dd=parseDate(r['수주예상일']||'');
+    const diff=dd?Math.floor((dd-baseDate)/86400000):null;
+    const lm=parseLastMod(r['최종수정일시']||'');
+    const cd=daysDiff(lm);
+    const amt=+r['금액합계(VAT포함)']||0;
+    if(diff!==null&&diff<0) items.push({cls:'u-over',badge:`D+${Math.abs(diff)} 초과`,r,sub:r['수주예상일']||'',amt,sort:0});
+    else if(cd!==null&&cd>=7) items.push({cls:'u-nocon',badge:`${cd}일 미연락`,r,sub:'연락 필요',amt,sort:1});
+    else if(diff!==null&&diff>=0&&diff<=3) items.push({cls:'u-soon',badge:`D-${diff} 임박`,r,sub:r['수주예상일']||'',amt,sort:2});
+  });
+  items.sort((a,b)=>a.sort-b.sort||b.amt-a.amt);
+  document.getElementById('urgentCount').textContent=items.length;
+  document.getElementById('urgentList').innerHTML=items.length===0
+    ?'<div class="urgent-none">✅ 긴급 건 없음</div>'
+    :items.map(u=>`<div class="urgent-item ${u.cls}" onclick="openModalByRow(${allData.indexOf(u.r)})">
+        <span class="u-badge">${u.badge}</span>
+        <span class="u-co">${u.r['거래처명']}</span>
+        <span class="u-writer">${getWriter(u.r)}</span>
+        <span class="u-dday">${u.sub}</span>
+        <span class="u-amt">${fmtAmt(u.amt)}</span>
+      </div>`).join('');
+}
+
+// ── Writer ──
+function renderWriter(){
+  const wm={};
   filtered.forEach(r=>{
     const w=getWriter(r)||'미지정';
-    if(!wMap[w]) wMap[w]={s:0,p:0,f:0,amt:0};
-    wMap[w][r._status==='success'?'s':r._status==='fail'?'f':'p']++;
-    wMap[w].amt+=(+r['금액합계(VAT포함)']||0);
+    if(!wm[w]) wm[w]={s:0,p:0,f:0,amt:0};
+    wm[w][r._status==='success'?'s':r._status==='fail'?'f':'p']++;
+    wm[w].amt+=(+r['금액합계(VAT포함)']||0);
   });
-  const wArr=Object.entries(wMap).sort((a,b)=>b[1].amt-a[1].amt);
-  document.getElementById('writerChart').innerHTML = wArr.length===0
-    ? '<div style="color:var(--muted);font-size:12px">데이터 없음</div>'
-    : wArr.map(([name,d])=>{
-        const total=d.s+d.p+d.f||1;
-        const sp=Math.round(d.s/total*100), pp=Math.round(d.p/total*100), fp=100-sp-pp;
-        return `<div class="writer-item">
-          <div class="writer-head">
-            <span class="writer-name">${name}</span>
-            <div class="writer-stats">
-              <span class="writer-stat-s">✓${d.s}</span>
-              <span class="writer-stat-p">◐${d.p}</span>
-              <span class="writer-stat-f">✗${d.f}</span>
-            </div>
-          </div>
-          <div class="writer-bar-track">
-            <div class="writer-bar-s" style="width:${sp}%"></div>
-            <div class="writer-bar-p" style="width:${pp}%"></div>
-            <div class="writer-bar-f" style="width:${fp}%"></div>
-          </div>
-        </div>`;
+  const arr=Object.entries(wm).sort((a,b)=>b[1].amt-a[1].amt);
+  document.getElementById('writerTbody').innerHTML=arr.length===0
+    ?'<tr><td colspan="7" style="color:var(--muted);padding:16px">데이터 없음</td></tr>'
+    :arr.map(([name,d])=>{
+        const tot=d.s+d.p+d.f||1;
+        const sp=Math.round(d.s/tot*100),pp=Math.round(d.p/tot*100),fp=100-sp-pp;
+        return `<tr>
+          <td class="wt-name">${name}</td>
+          <td>${d.s+d.p+d.f}건</td>
+          <td class="wt-s-val">${d.s}</td>
+          <td class="wt-p-val">${d.p}</td>
+          <td class="wt-f-val">${d.f}</td>
+          <td><div class="wt-bar"><div class="wt-s" style="width:${sp}%"></div><div class="wt-p" style="width:${pp}%"></div><div class="wt-f" style="width:${fp}%"></div></div></td>
+          <td class="wt-amt">${fmtAmt(d.amt)}</td>
+        </tr>`;
       }).join('');
+}
 
-  // 유입경로 성공률
-  const iMap = {};
-  filtered.forEach(r=>{
-    const k=(r['유입경로']||'기타').trim()||'기타';
-    if(!iMap[k]) iMap[k]={total:0,success:0};
-    iMap[k].total++;
-    if(r._status==='success') iMap[k].success++;
-  });
-  const iArr=Object.entries(iMap).filter(([,d])=>d.total>=1).sort((a,b)=>b[1].success/b[1].total-a[1].success/a[1].total);
-  document.getElementById('inflowChart').innerHTML = iArr.length===0
-    ? '<div style="color:var(--muted);font-size:12px">데이터 없음</div>'
-    : iArr.map(([name,d],i)=>{
-        const rate=Math.round(d.success/d.total*100);
-        const color=rate>=50?'var(--green)':rate>=25?'var(--yellow)':'var(--red)';
-        return `<div class="inflow-item">
-          <div class="inflow-head">
-            <span class="inflow-name">${name} <span style="color:var(--muted);font-size:10px">${d.total}건</span></span>
-            <span class="inflow-rate" style="color:${color}">${rate}%</span>
-          </div>
-          <div class="inflow-track">
-            <div class="inflow-fill" style="width:${rate}%;background:${color}"></div>
-          </div>
-        </div>`;
-      }).join('');
-
-  // 설비 유형
-  const eMap = {};
-  filtered.forEach(r=>{
-    const k=extractProductType(r);
-    if(!eMap[k]) eMap[k]={cnt:0,amt:0};
-    eMap[k].cnt++; eMap[k].amt+=(+r['금액합계(VAT포함)']||0);
-  });
-  const eArr=Object.entries(eMap).sort((a,b)=>b[1].amt-a[1].amt);
-  const maxAmt=eArr[0]?.[1].amt||1;
-  document.getElementById('equipChart').innerHTML = eArr.length===0
-    ? '<div style="color:var(--muted);font-size:12px">데이터 없음</div>'
-    : eArr.map(([name,d],i)=>`
-        <div class="equip-item">
-          <div class="equip-head">
-            <span class="equip-name">${name}</span>
-            <span class="equip-val">${d.cnt}건 · ${fmtAmt(d.amt)}</span>
-          </div>
-          <div class="equip-track">
-            <div class="equip-fill" style="width:${Math.round(d.amt/maxAmt*100)}%;background:${CHART_COLORS[i%CHART_COLORS.length]}"></div>
-          </div>
-        </div>`).join('');
+// ── Equip ──
+function renderEquip(){
+  const em={};
+  filtered.forEach(r=>{const k=getProdType(r);if(!em[k])em[k]={cnt:0,amt:0};em[k].cnt++;em[k].amt+=(+r['금액합계(VAT포함)']||0);});
+  const arr=Object.entries(em).sort((a,b)=>b[1].amt-a[1].amt);
+  const maxA=arr[0]?.[1].amt||1;
+  document.getElementById('equipChart').innerHTML=arr.length===0
+    ?'<div class="empty">데이터 없음</div>'
+    :`<table style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;padding:6px 12px;text-align:left;border-bottom:1px solid var(--border)">설비 유형</th>
+          <th style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;padding:6px 12px;text-align:right;border-bottom:1px solid var(--border)">건수</th>
+          <th style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;padding:6px 12px;text-align:right;border-bottom:1px solid var(--border)">금액</th>
+          <th style="padding:6px 12px;border-bottom:1px solid var(--border);width:40%"></th>
+        </tr></thead>
+        <tbody>${arr.map(([name,d],i)=>`<tr style="border-bottom:1px solid var(--divider)">
+          <td style="padding:9px 12px;font-weight:600;font-size:13px">${name}</td>
+          <td style="padding:9px 12px;text-align:right;font-size:12px;color:var(--text2)">${d.cnt}건</td>
+          <td style="padding:9px 12px;text-align:right;font-weight:700;font-size:13px">${fmtAmt(d.amt)}</td>
+          <td style="padding:9px 12px"><div style="background:var(--surface3);border-radius:3px;height:5px;overflow:hidden"><div style="width:${Math.round(d.amt/maxA*100)}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:3px;transition:width 0.5s"></div></div></td>
+        </tr>`).join('')}</tbody>
+      </table>`;
 }
 
 // ── Sort ──
-function sortBy(col) {
-  if(sortCol===col) sortDir*=-1; else { sortCol=col; sortDir=1; }
-  renderTable();
-}
-function getSortVal(r,col) {
-  if(col==='contact') { const d=parseLastModDate(r['최종수정일시']||''); return d?d.getTime():0; }
-  if(col==='deadline') { const d=parseDate(r['수주예상일']||''); return d?d.getTime():99999999999; }
+function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}renderTable();}
+function sortVal(r,col){
+  if(col==='contact'){const d=parseLastMod(r['최종수정일시']||'');return d?d.getTime():0;}
+  if(col==='deadline'){const d=parseDate(r['수주예상일']||'');return d?d.getTime():99999999999;}
   if(col==='amount') return +(r['금액합계(VAT포함)']||0);
-  if(col==='date') { const d=parseDate((r['일자-No.']||'').split(' ')[0]); return d?d.getTime():0; }
+  if(col==='date'){const d=parseDate((r['일자-No.']||'').split(' ')[0]);return d?d.getTime():0;}
   if(col==='company') return r['거래처명']||'';
   if(col==='writer') return getWriter(r);
   return '';
 }
 
 // ── Table ──
-function renderTable() {
+function renderTable(){
   document.getElementById('tableCount').textContent=`총 ${filtered.length}건`;
-
   let data=[...filtered];
-  if(sortCol) {
-    data.sort((a,b)=>{
-      const va=getSortVal(a,sortCol), vb=getSortVal(b,sortCol);
-      return va<vb?-sortDir:va>vb?sortDir:0;
-    });
-  }
+  if(sortCol) data.sort((a,b)=>{const va=sortVal(a,sortCol),vb=sortVal(b,sortCol);return va<vb?-sortDir:va>vb?sortDir:0;});
+  if(data.length===0){document.getElementById('tableBody').innerHTML='<div class="empty">조건에 맞는 견적이 없어요</div>';return;}
 
-  if(data.length===0) {
-    document.getElementById('tableBody').innerHTML='<div class="empty">조건에 맞는 견적이 없어요</div>';
-    return;
-  }
-
-  const si=(col)=>sortCol!==col?'<span style="opacity:0.3;margin-left:3px">⇅</span>':sortDir===1?'<span style="color:var(--red);margin-left:3px">↑</span>':'<span style="color:var(--red);margin-left:3px">↓</span>';
+  const si=col=>sortCol!==col?'<span style="opacity:0.25;margin-left:2px">⇅</span>':sortDir===1?'<span style="color:var(--red);margin-left:2px">↑</span>':'<span style="color:var(--red);margin-left:2px">↓</span>';
   const th=(col,lbl)=>`<th onclick="sortBy('${col}')">${lbl}${si(col)}</th>`;
 
-  let html=`<table><thead><tr>
+  let html=`<table class="main-tbl"><thead><tr>
     ${th('date','일자')} ${th('company','거래처')}
-    <th>품목</th> <th>유입</th>
+    <th>품목</th><th>유입</th>
     ${th('amount','금액')} ${th('writer','담당')}
-    ${th('contact','연락')} ${th('deadline','수주예상일')}
-    <th>상태</th>
+    ${th('contact','연락')} ${th('deadline','수주예상일')} <th>상태</th>
   </tr></thead><tbody>`;
 
-  data.forEach((r,i)=>{
-    const globalIdx = allData.indexOf(r);
-    const dateStr=(r['일자-No.']||'').split(' ')[0];
-    const lastMod=parseLastModDate(r['최종수정일시']||'');
-    const contactDays=daysDiff(lastMod);
-    const ddDate=parseDate(r['수주예상일']||'');
-    const ddDiff=ddDate?Math.floor((ddDate-baseDate)/86400000):null;
+  data.forEach(r=>{
+    const gi=allData.indexOf(r);
+    const ds=(r['일자-No.']||'').split(' ')[0];
+    const lm=parseLastMod(r['최종수정일시']||''); const cd=daysDiff(lm);
+    const dd=parseDate(r['수주예상일']||''); const df=dd?Math.floor((dd-baseDate)/86400000):null;
+    const ddS=(r['수주예상일']||'').trim().replace(/\//g,'.').slice(-5);
     const bizTag=r._biz==='corp'?'<span class="tag tag-corp">법인</span>':'<span class="tag tag-person">개인</span>';
-    const periodTag=r._period?(r._period==='short'?'<span class="tag tag-short">단기</span>':'<span class="tag tag-long">장기</span>'):'';
-
-    // contact badge
-    let cb;
-    if(contactDays===null) cb='<span class="cb cb-gray">–</span>';
-    else if(contactDays===0) cb='<span class="cb cb-ok">오늘</span>';
-    else if(contactDays<=3) cb=`<span class="cb cb-ok">${contactDays}일 전</span>`;
-    else if(contactDays<=7) cb=`<span class="cb cb-warn">${contactDays}일 전</span>`;
-    else cb=`<span class="cb cb-over">${contactDays}일 전 ⚠</span>`;
-
-    // deadline badge
-    const ddStr=(r['수주예상일']||'').trim().replace(/\//g,'.').slice(-5);
-    let db;
+    const perTag=r._period?(r._period==='short'?'<span class="tag tag-short">단기</span>':'<span class="tag tag-long">장기</span>'):'';
+    const inf=r['유입경로']||'';
+    const ic=inf.includes('유튜브')?'ifl-yt':inf.includes('다소유')?'ifl-da':inf.includes('블로그')?'ifl-bl':(inf.includes('쇼핑몰')||inf.includes('홈페이지'))?'ifl-sh':inf.includes('기존')?'ifl-ex':'ifl-et';
+    let cb,db,stag;
+    if(cd===null) cb='<span class="cb cb-gray">–</span>';
+    else if(cd===0) cb='<span class="cb cb-ok">오늘</span>';
+    else if(cd<=3) cb=`<span class="cb cb-ok">${cd}일 전</span>`;
+    else if(cd<=7) cb=`<span class="cb cb-warn">${cd}일 전</span>`;
+    else cb=`<span class="cb cb-over">${cd}일 전 ⚠</span>`;
     if(r._status==='success') db='<span class="db db-done">✓ 수주완료</span>';
     else if(r._status==='fail') db='<span class="db db-fail">✗ 실패</span>';
-    else if(ddDiff===null) db='<span class="db cb-gray">–</span>';
-    else if(ddDiff<0) db=`<span class="db db-over">D+${Math.abs(ddDiff)} 초과<div class="db-date">${ddStr}</div></span>`;
-    else if(ddDiff===0) db=`<span class="db db-over">오늘 마감!<div class="db-date">${ddStr}</div></span>`;
-    else if(ddDiff<=7) db=`<span class="db db-near">D-${ddDiff}<div class="db-date">${ddStr}</div></span>`;
-    else db=`<span class="db db-ok">D-${ddDiff}<div class="db-date">${ddStr}</div></span>`;
-
-    // inflow
-    const inf=r['유입경로']||'';
-    const icls=inf.includes('유튜브')?'ifl-yt':inf.includes('다소유')?'ifl-da':inf.includes('블로그')?'ifl-bl':(inf.includes('쇼핑몰')||inf.includes('홈페이지'))?'ifl-sh':inf.includes('기존')?'ifl-ex':'ifl-et';
-
-    // status
-    let stag;
+    else if(df===null) db='<span class="db cb-gray">–</span>';
+    else if(df<0) db=`<span class="db db-over">D+${Math.abs(df)} 초과<div class="db-date">${ddS}</div></span>`;
+    else if(df===0) db=`<span class="db db-over">오늘 마감!<div class="db-date">${ddS}</div></span>`;
+    else if(df<=7) db=`<span class="db db-near">D-${df}<div class="db-date">${ddS}</div></span>`;
+    else db=`<span class="db db-ok">D-${df}<div class="db-date">${ddS}</div></span>`;
     if(r._status==='success') stag='<span class="tag tag-success">✓ 성공</span>';
     else if(r._status==='fail') stag='<span class="tag tag-fail">✗ 실패</span>';
-    else if(r._period==='long') stag='<span class="tag tag-pl">장기가망</span>';
-    else stag='<span class="tag tag-ps">단기가망</span>';
+    else stag=r._period==='long'?'<span class="tag tag-pl">장기가망</span>':'<span class="tag tag-ps">단기가망</span>';
 
-    html+=`<tr onclick="openModalByRow(${globalIdx})">
-      <td class="td-date hide-m" data-label="일자">${dateStr}</td>
-      <td data-label="거래처">
-        <div class="td-co">${r['거래처명']||''}</div>
-        <div style="display:flex;gap:3px;margin-top:3px">${bizTag}${periodTag}</div>
-      </td>
+    html+=`<tr onclick="openModalByRow(${gi})">
+      <td class="td-date hide-m" data-label="일자">${ds}</td>
+      <td data-label="거래처"><div class="td-co">${r['거래처명']||''}</div><div class="td-sub">${bizTag}${perTag}</div></td>
       <td class="td-prod" data-label="품목">${r['품목명(요약)']||r['견적명']||''}</td>
-      <td data-label="유입"><span class="ifl ${icls}">${inf||'–'}</span></td>
+      <td data-label="유입"><span class="ifl ${ic}">${inf||'–'}</span></td>
       <td class="td-amt" data-label="금액">${fmtAmt(+r['금액합계(VAT포함)']||0)}</td>
       <td class="td-writer" data-label="담당">${getWriter(r)}</td>
       <td data-label="연락">${cb}</td>
@@ -1052,109 +934,73 @@ function renderTable() {
 }
 
 // ── Modal ──
-function openModalByRow(idx) {
-  const r=allData[idx];
+function openModalByRow(idx){openModalContent(allData[idx]);}
+function openModal(idx){openModalContent(filtered[idx]);}
+function openModalContent(r){
   if(!r) return;
-  openModalContent(r);
-}
-function openModal(idx) {
-  openModalContent(filtered[idx]);
-}
-function openModalContent(r) {
-  if(!r) return;
-  const ddDate=parseDate(r['수주예상일']||'');
-  const ddDiff=ddDate?Math.floor((ddDate-baseDate)/86400000):null;
-  const lastMod=parseLastModDate(r['최종수정일시']||'');
-  const contactDays=daysDiff(lastMod);
-  const ddStr=(r['수주예상일']||'').trim();
-
-  let ddText='–';
-  if(r._status==='success') ddText='✓ 수주 완료';
-  else if(r._status==='fail') ddText='✗ 실패';
-  else if(ddDiff!==null) {
-    if(ddDiff<0) ddText=`<span style="color:var(--red)">D+${Math.abs(ddDiff)} 초과 ⚠</span>`;
-    else if(ddDiff===0) ddText=`<span style="color:var(--red)">오늘 마감!</span>`;
-    else ddText=`D-${ddDiff}`;
-  }
-
-  const bizTag=r._biz==='corp'?'<span class="tag tag-corp">법인</span>':'<span class="tag tag-person">개인</span>';
-  const periodTag=r._period?(r._period==='short'?'<span class="tag tag-short">단기</span>':'<span class="tag tag-long">장기</span>'):'';
-  let stag;
-  if(r._status==='success') stag='<span class="tag tag-success">✓ 성공</span>';
-  else if(r._status==='fail') stag='<span class="tag tag-fail">✗ 실패</span>';
-  else stag=r._period==='long'?'<span class="tag tag-pl">장기가망</span>':'<span class="tag tag-ps">단기가망</span>';
-
+  const dd=parseDate(r['수주예상일']||''); const df=dd?Math.floor((dd-baseDate)/86400000):null;
+  const lm=parseLastMod(r['최종수정일시']||''); const cd=daysDiff(lm);
+  const ddS=r['수주예상일']||'';
+  let ddT='–';
+  if(r._status==='success') ddT='✓ 수주 완료';
+  else if(r._status==='fail') ddT='✗ 실패';
+  else if(df!==null) ddT=df<0?`<span style="color:var(--red)">D+${Math.abs(df)} 초과 ⚠</span>`:df===0?`<span style="color:var(--red)">오늘 마감!</span>`:`D-${df}`;
+  const bTag=r._biz==='corp'?'<span class="tag tag-corp">법인</span>':'<span class="tag tag-person">개인</span>';
+  const pTag=r._period?(r._period==='short'?'<span class="tag tag-short">단기</span>':'<span class="tag tag-long">장기</span>'):'';
+  let sTag;
+  if(r._status==='success') sTag='<span class="tag tag-success">✓ 성공</span>';
+  else if(r._status==='fail') sTag='<span class="tag tag-fail">✗ 실패</span>';
+  else sTag=r._period==='long'?'<span class="tag tag-pl">장기가망</span>':'<span class="tag tag-ps">단기가망</span>';
   const inf=r['유입경로']||'';
-  const icls=inf.includes('유튜브')?'ifl-yt':inf.includes('다소유')?'ifl-da':inf.includes('블로그')?'ifl-bl':(inf.includes('쇼핑몰')||inf.includes('홈페이지'))?'ifl-sh':inf.includes('기존')?'ifl-ex':'ifl-et';
-
-  const hists=parseHistory(r['견적결과(보고)']||'');
-
+  const ic=inf.includes('유튜브')?'ifl-yt':inf.includes('다소유')?'ifl-da':inf.includes('블로그')?'ifl-bl':(inf.includes('쇼핑몰')||inf.includes('홈페이지'))?'ifl-sh':inf.includes('기존')?'ifl-ex':'ifl-et';
+  const hists=parseHist(r['견적결과(보고)']||'');
   document.getElementById('modalContent').innerHTML=`
-    <div class="modal-tags">${bizTag}${periodTag}${stag}</div>
+    <div class="modal-tags">${bTag}${pTag}${sTag}</div>
     <div class="modal-co">${r['거래처명']||''}</div>
     <div class="modal-stat-row">
-      <div class="modal-stat">
-        <span class="modal-stat-ico">📞</span>
-        <div><div class="modal-stat-lbl">마지막 연락</div>
-        <div class="modal-stat-val">${contactDays===null?'–':contactDays===0?'오늘':contactDays+'일 전'}</div></div>
-      </div>
-      <div class="modal-stat">
-        <span class="modal-stat-ico">📅</span>
-        <div><div class="modal-stat-lbl">수주예상일</div>
-        <div class="modal-stat-val">${ddStr||'–'}</div></div>
-      </div>
-      <div class="modal-stat">
-        <span class="modal-stat-ico">⏱</span>
-        <div><div class="modal-stat-lbl">D-day</div>
-        <div class="modal-stat-val">${ddText}</div></div>
-      </div>
+      <div class="modal-stat"><span class="modal-stat-ico">📞</span><div><div class="ms-lbl">마지막 연락</div><div class="ms-val">${cd===null?'–':cd===0?'오늘':cd+'일 전'}</div></div></div>
+      <div class="modal-stat"><span class="modal-stat-ico">📅</span><div><div class="ms-lbl">수주예상일</div><div class="ms-val">${ddS||'–'}</div></div></div>
+      <div class="modal-stat"><span class="modal-stat-ico">⏱</span><div><div class="ms-lbl">D-day</div><div class="ms-val">${ddT}</div></div></div>
     </div>
-    <div class="modal-info-grid">
-      <div class="modal-info-item"><label>견적 일자</label><div class="modal-info-val">${(r['일자-No.']||'').split(' ')[0]}</div></div>
-      <div class="modal-info-item"><label>금액 (VAT포함)</label><div class="modal-info-val big">${(+r['금액합계(VAT포함)']||0).toLocaleString()}원</div></div>
-      <div class="modal-info-item"><label>작성자</label><div class="modal-info-val">${r['작성자']||getWriter(r)}</div></div>
-      <div class="modal-info-item"><label>지역</label><div class="modal-info-val">${r['지역']||'–'}</div></div>
-      <div class="modal-info-item"><label>고객 연락처</label><div class="modal-info-val">${r['고객연락처']||'–'}</div></div>
-      <div class="modal-info-item"><label>유입경로</label><div class="modal-info-val"><span class="ifl ${icls}">${inf||'–'}</span></div></div>
+    <div class="modal-info">
+      <div class="mi"><label>견적 일자</label><div class="mi-val">${(r['일자-No.']||'').split(' ')[0]}</div></div>
+      <div class="mi"><label>금액 (VAT포함)</label><div class="mi-val big">${(+r['금액합계(VAT포함)']||0).toLocaleString()}원</div></div>
+      <div class="mi"><label>작성자</label><div class="mi-val">${r['작성자']||getWriter(r)}</div></div>
+      <div class="mi"><label>지역</label><div class="mi-val">${r['지역']||'–'}</div></div>
+      <div class="mi"><label>고객 연락처</label><div class="mi-val">${r['고객연락처']||'–'}</div></div>
+      <div class="mi"><label>유입경로</label><div class="mi-val"><span class="ifl ${ic}">${inf||'–'}</span></div></div>
     </div>
     <div class="modal-prod-lbl">최종 품목 내역</div>
-    <div class="modal-product">${r['품목명(요약)']||r['견적명']||'–'}</div>
+    <div class="modal-prod">${r['품목명(요약)']||r['견적명']||'–'}</div>
     <hr class="modal-hr">
     <div class="hist-ttl">📞 영업 상담 히스토리</div>
-    ${hists.length===0?'<div style="color:var(--muted);font-size:12px">기록 없음</div>':hists.map(h=>`
-      <div class="hist-entry">
-        ${h.date?`<div class="hist-dt">${h.date}</div>`:''}
-        <div class="hist-txt">${h.text}</div>
-      </div>`).join('')}
+    ${hists.length===0?'<div style="color:var(--muted);font-size:12px">기록 없음</div>':hists.map(h=>`<div class="hist-entry">${h.date?`<div class="hist-dt">${h.date}</div>`:''}<div class="hist-txt">${h.text}</div></div>`).join('')}
   `;
   document.getElementById('modalOverlay').classList.add('on');
 }
-
-function parseHistory(text) {
+function parseHist(text){
   if(!text) return [];
   const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
-  const entries=[]; let cur=null;
-  lines.forEach(line=>{
-    const m=line.match(/^(\d{1,2}\.\d{1,2}|기록)/);
-    if(m) {
-      if(cur) entries.push(cur);
-      cur={date:m[0], text:line.replace(/^(\d{1,2}\.\d{1,2}|기록)\s*[-–]?\s*/,'')};
-    } else { if(cur) cur.text+='\n'+line; else cur={date:null,text:line}; }
+  const res=[]; let cur=null;
+  lines.forEach(l=>{
+    const m=l.match(/^(\d{1,2}\.\d{1,2}|기록)/);
+    if(m){if(cur)res.push(cur);cur={date:m[0],text:l.replace(/^(\d{1,2}\.\d{1,2}|기록)\s*[-–]?\s*/,'')};}
+    else{if(cur)cur.text+='\n'+l;else cur={date:null,text:l};}
   });
-  if(cur) entries.push(cur);
-  return entries.length?entries:[{date:null,text:text}];
+  if(cur) res.push(cur);
+  return res.length?res:[{date:null,text:text}];
 }
-
-function closeModal() { document.getElementById('modalOverlay').classList.remove('on'); }
-function closeModalOutside(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+function closeModal(){document.getElementById('modalOverlay').classList.remove('on');}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
 
 // ── Init ──
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('baseDate').value=formatDate(new Date());
-  document.getElementById('baseDate').addEventListener('change', applyFilters);
+  const saved=localStorage.getItem('soyuTheme')||'dark';
+  setTheme(saved);
+  document.getElementById('baseDate').value=fmt(new Date());
+  document.getElementById('baseDate').addEventListener('change',applyFilters);
   loadAll();
 });
 </script>
-
 </body>
 </html>
