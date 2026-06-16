@@ -523,34 +523,72 @@ async function fetchTab(tabName) {
 }
 
 function parseCSV(text, tabName) {
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-  if (lines.length < 2) return [];
-
-  // Find header row (contains 일자-No. or 거래처명)
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(5, lines.length); i++) {
-    if (lines[i].includes('거래처명') || lines[i].includes('일자-No')) {
-      headerIdx = i; break;
-    }
+  // gviz CSV: no header row, data starts immediately
+  // First rebuild logical lines (handle quoted newlines)
+  const allLines = text.split('\n');
+  const lines = [];
+  let cur = '', inQ = false;
+  for (const l of allLines) {
+    for (const c of l) { if (c === '"') inQ = !inQ; }
+    cur += (cur ? '\n' : '') + l;
+    if (!inQ) { lines.push(cur); cur = ''; }
   }
+  if (cur) lines.push(cur);
 
-  const headers = parseCSVLine(lines[headerIdx]);
+  const meta = TABS[tabName];
   const rows = [];
-  for (let i = headerIdx + 1; i < lines.length; i++) {
-    const vals = parseCSVLine(lines[i]);
-    if (!vals[0] || vals[0].trim() === '') continue;
-    const obj = {};
-    headers.forEach((h, idx) => { obj[h.trim()] = (vals[idx] || '').trim(); });
-    if (!obj['거래처명'] || obj['거래처명'].trim() === '') continue;
 
-    const meta = TABS[tabName];
-    obj._biz = meta.biz;
-    obj._period = meta.period;
-    obj._status = meta.status;
-    obj._tab = tabName;
+  // 개인단기: col[1]=내외자구분 추가 → offset +1
+  // 나머지: offset 0
+  // 확정 컬럼맵 (25컬럼 기준):
+  // [0]일자-No. [1]사업자번호 [2]거래처명 [3]유입경로 [4]고객명 [5]고객연락처
+  // [6]거래처담당자 [7]작성자 [8]견적명 [9]품목명(요약) [10]견적유효기간
+  // [11]수량합계 [12]금액합계 [13]진행상태 [14]수주예상일 [15]대면영업여부
+  // [16]지역 [17]견적결과(보고) [18]첨부 [19]생성한전표 [20]인쇄
+  // [21]이메일 [22]FAX [23]최종수정일시 [24]마지막수정자
+  const o = (tabName === '개인단기') ? 1 : 0;
+
+  for (const line of lines) {
+    const v = parseCSVLine(line);
+    if (!v || v.length < 10) continue;
+
+    const dateNo  = clean(v[0]);
+    const company = clean(v[2 + o]);
+
+    // 유효 데이터행: 날짜 형식 YYYY/MM/DD 이고 거래처명 존재
+    if (!dateNo.match(/^\d{4}\/\d{2}\/\d{2}/) || !company) continue;
+
+    const obj = {
+      '일자-No.':         dateNo,
+      '거래처명':          company,
+      '유입경로':          clean(v[3 + o]),
+      '고객명':            clean(v[4 + o]),
+      '고객연락처':        clean(v[5 + o]),
+      '거래처담당자':      clean(v[6 + o]),
+      '작성자':            clean(v[7 + o]),
+      '견적명':            clean(v[8 + o]),
+      '품목명(요약)':      clean(v[9 + o]),
+      '견적유효기간':      clean(v[10 + o]),
+      '수량합계':          clean(v[11 + o]),
+      '금액합계(VAT포함)': clean(v[12 + o]).replace(/[^0-9]/g, ''),
+      '진행상태':          clean(v[13 + o]),
+      '수주예상일':        clean(v[14 + o]),
+      '지역':              clean(v[16 + o]),
+      '견적결과(보고)':    clean(v[17 + o]),
+      '최종수정일시':      clean(v[23 + o]),
+      '마지막수정자':      clean(v[24 + o]),
+      _biz:    meta.biz,
+      _period: meta.period,
+      _status: meta.status,
+      _tab:    tabName,
+    };
     rows.push(obj);
   }
   return rows;
+}
+
+function clean(v) {
+  return (v || '').trim().replace(/^"|"$/g, '');
 }
 
 function parseCSVLine(line) {
